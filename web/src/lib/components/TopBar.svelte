@@ -104,6 +104,9 @@
     <button class="item" onclick={openFile}>Open .numnotes file…</button>
     <button class="item" onclick={duplicate}>Duplicate this app</button>
     <button class="item" onclick={removeProject}>Delete this app</button>
+    <div class="sep"></div>
+    <button class="item" onclick={() => { projectMenu = false; downloadNwa(); }}>Download .nwa</button>
+    <button class="item" onclick={() => { projectMenu = false; downloadProject(); }}>Download project file</button>
     {#if store.projects.length > 1}
       <div class="sep"></div>
       {#each store.projects.filter((p) => p.id !== project.id).slice(0, 8) as p (p.id)}
@@ -136,9 +139,9 @@
     <button class="text-btn" title="Redo (⇧⌘Z)" disabled={!store.canRedo} onclick={() => store.redo()}>Redo</button>
   </div>
 
-  <StorageMeter />
+  <div class="meter-slot"><StorageMeter /></div>
 
-  <Menu open={downloadMenu} align="right" onclose={() => (downloadMenu = false)}>
+  <div class="dl"><Menu open={downloadMenu} align="right" onclose={() => (downloadMenu = false)}>
     {#snippet trigger()}
       <Button onclick={() => (downloadMenu = !downloadMenu)} disabled={busy} aria-haspopup="menu">Download ▾</Button>
     {/snippet}
@@ -148,9 +151,9 @@
     <button class="item" onclick={downloadProject}>
       <span>Project file (.numnotes)<span class="desc">Backup, or keep editing elsewhere</span></span>
     </button>
-  </Menu>
+  </Menu></div>
 
-  <Button variant="primary" onclick={() => (installOpen = true)}>Send to calculator</Button>
+  <Button variant="primary" onclick={() => (installOpen = true)}>Send<span class="long">&nbsp;to calculator</span></Button>
 </header>
 
 <IconDialog open={iconOpen} onclose={() => (iconOpen = false)} />
@@ -253,11 +256,21 @@
     }
   }
   @media (max-width: 640px) {
-    .history {
+    .history,
+    .dl,
+    .meter-slot,
+    .long {
       display: none;
     }
     .name {
-      width: 110px;
+      width: auto;
+      flex: 1;
+    }
+    .identity {
+      flex: 1;
+    }
+    .spacer {
+      display: none;
     }
   }
 </style>
