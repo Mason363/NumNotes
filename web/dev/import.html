@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Import test</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font: 14px/1.45 system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      body.dragging {
+        outline: 3px dashed #4a7cff;
+        outline-offset: -8px;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 12px 0 0;
+      }
+      #status {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        min-height: 24px;
+      }
+      progress {
+        width: 240px;
+      }
+      #errors li {
+        color: #d33;
+      }
+      #results {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      }
+      .card {
+        border: 1px solid #8884;
+        border-radius: 8px;
+        padding: 10px;
+        overflow: hidden;
+      }
+      .card h2 {
+        font-size: 14px;
+        margin: 0 0 4px;
+        word-break: break-all;
+      }
+      .meta {
+        font-size: 12px;
+        opacity: 0.75;
+        margin-bottom: 8px;
+      }
+      .checker {
+        background: repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+        display: inline-block;
+        max-width: 100%;
+      }
+      canvas {
+        display: block;
+        max-width: 100%;
+      }
+      .strip {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .rich {
+        border-top: 1px solid #8884;
+        max-height: 360px;
+        overflow: auto;
+      }
+      .rich img {
+        max-width: 100%;
+      }
+      .rich table,
+      table.data {
+        border-collapse: collapse;
+      }
+      .rich td,
+      .rich th,
+      table.data td {
+        border: 1px solid #8886;
+        padding: 2px 6px;
+      }
+      pre {
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow: auto;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Import test</h1>
+      <input id="picker" type="file" multiple />
+      <button id="fixtures" type="button">Load bundled fixtures</button>
+      <label><input id="lenient" type="checkbox" checked /> continue past failures</label>
+      <button id="clear" type="button">Clear</button>
+    </header>
+    <p>Drop files or folders anywhere, pick them above, or paste (images, rich text, spreadsheet cells).</p>
+    <div id="status" hidden>
+      <progress id="progress" max="1" value="0"></progress>
+      <span id="label"></span>
+      <button id="cancel" type="button">Cancel</button>
+    </div>
+    <ul id="errors"></ul>
+    <div id="results"></div>
+    <script type="module" src="/src/import/manual-test.ts"></script>
+  </body>
+</html>

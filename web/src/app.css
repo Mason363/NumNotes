@@ -1,0 +1,150 @@
+/* Flat and plain, like the calculator it serves: NumWorks yellow, greys,
+ * hairline borders, square corners. */
+:root {
+  --bg: #f0f0f0;
+  --panel: #ffffff;
+  --panel-2: #f7f7f7;
+  --hover: #ececec;
+  --line: #dcdcdc;
+  --line-strong: #c4c4c4;
+  --text: #1f1f1f;
+  --dim: #666666;
+  --faint: #999999;
+  --accent: #ffb734;
+  --accent-strong: #f5a41c;
+  --accent-soft: #fff3d6;
+  --accent-text: #8a5a00;
+  --on-accent: #1f1f1f;
+  --danger: #d8352a;
+  --ok: #2e8b3d;
+  --focus: 0 0 0 2px #1f1f1f;
+  --shadow-sm: none;
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --radius: 3px;
+  --radius-sm: 2px;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #161616;
+    --panel: #1e1e1e;
+    --panel-2: #191919;
+    --hover: #2a2a2a;
+    --line: #333333;
+    --line-strong: #474747;
+    --text: #e8e8e8;
+    --dim: #a3a3a3;
+    --faint: #707070;
+    --accent-soft: #3a2d10;
+    --accent-text: #ffc85c;
+    --focus: 0 0 0 2px #ffb734;
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #161616;
+  --panel: #1e1e1e;
+  --panel-2: #191919;
+  --hover: #2a2a2a;
+  --line: #333333;
+  --line-strong: #474747;
+  --text: #e8e8e8;
+  --dim: #a3a3a3;
+  --faint: #707070;
+  --accent-soft: #3a2d10;
+  --accent-text: #ffc85c;
+  --focus: 0 0 0 2px #ffb734;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.45 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 650;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent-text);
+}
+
+.muted {
+  color: var(--dim);
+}
+
+.small {
+  font-size: 12px;
+}
+
+/* Section labels: small caps like the calculator's title bars. */
+.label-caps {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+::selection {
+  background: rgba(255, 183, 52, 0.4);
+}

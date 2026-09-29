@@ -1,0 +1,7 @@
+node_modules/
+dist/
+viewer/build/
+web/public/viewer/
+.DS_Store
+*.log
+.vite/

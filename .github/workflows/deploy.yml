@@ -1,0 +1,66 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install toolchains
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi clang lld
+
+      - name: Build the calculator app template
+        run: make -C viewer install-web ARM_PREFIX=arm-none-eabi- CLANG=clang
+
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: web
+
+      - name: Test
+        run: |
+          npm test
+          npm run check
+        working-directory: web
+
+      - name: Test the viewer
+        run: make -C viewer test ARM_PREFIX=arm-none-eabi- CLANG=clang
+
+      - name: Build the website
+        run: npm run build
+        working-directory: web
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
