@@ -133,7 +133,10 @@ export const MathBlock = Node.create({
         },
         selectNode: () => {
           dom.classList.add('editing');
-          setTimeout(() => input.focus(), 0);
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 0);
         },
         deselectNode: () => dom.classList.remove('editing'),
         stopEvent: (e) => e.target === input,

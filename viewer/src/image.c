@@ -27,13 +27,16 @@ static int s_last_hit; /* slot index + 1, 0 when unknown */
 bool image_init(size_t budget) {
   size_t per_slot = sizeof(slot_t) + TILE_PIXELS * sizeof(uint16_t);
   size_t scratch = TILE_PIXELS;
+  s_slot_count = 0;
   if (budget < scratch + 4 * per_slot) return false;
-  s_slot_count = (int)((budget - scratch) / per_slot);
-  if (s_slot_count > 96) s_slot_count = 96;
-  s_slots = nn_alloc(s_slot_count * sizeof(slot_t));
-  s_pixels = nn_alloc((size_t)s_slot_count * TILE_PIXELS * sizeof(uint16_t));
+  int count = (int)((budget - scratch) / per_slot);
+  if (count > 96) count = 96;
+  s_slots = nn_alloc(count * sizeof(slot_t));
+  s_pixels = nn_alloc((size_t)count * TILE_PIXELS * sizeof(uint16_t));
   s_scratch = nn_alloc(scratch);
-  return s_slots && s_pixels && s_scratch;
+  if (!s_slots || !s_pixels || !s_scratch) return false;
+  s_slot_count = count;
+  return true;
 }
 
 void image_flush(void) {
@@ -153,7 +156,9 @@ void image_draw(gfx_t *g, int image, nn_rect_t dst) {
   const nn_image_t *img = bundle_image(image);
   nn_rect_t c = nn_rect_intersect(dst, g->clip);
   if (nn_rect_empty(c)) return;
-  if (img == NULL || img->tile_shift < 3 || img->tile_shift > MAX_TILE_SHIFT) {
+  /* Without a tile cache (too little RAM) pictures show as placeholders. */
+  if (img == NULL || s_slot_count == 0 || img->tile_shift < 3 ||
+      img->tile_shift > MAX_TILE_SHIFT) {
     gfx_fill(g, c, ERROR_COLOR);
     return;
   }

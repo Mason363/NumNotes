@@ -143,6 +143,7 @@
   }
   .page :global(.ProseMirror) {
     outline: none;
+    box-shadow: none;
     min-height: 100%;
     word-wrap: break-word;
   }
