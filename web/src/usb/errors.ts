@@ -27,4 +27,4 @@ export class CalculatorError extends Error {
 }
 
 export const FIRMWARE_TOO_OLD_MESSAGE =
-  'The calculator’s firmware is too old. Update it at numworks.com/update';
+  'Couldn’t find the calculator’s software. Unplug it, plug it back in and try again. If that fails, download the app file instead.';

@@ -60,6 +60,8 @@ export interface MockMemoryOptions {
   externalAppsFlashEnd?: number;
   /** Leave out the SRAM slot info, like firmware older than Epsilon 16. */
   legacyFirmware?: boolean;
+  /** Also point the slot info at the kernel header (older firmware did). */
+  kernelInSlotInfo?: boolean;
 }
 
 export interface MockMemory {
@@ -113,7 +115,8 @@ export function createMockMemory(options: MockMemoryOptions = {}): MockMemory {
 
   const sram = new Uint8Array(MOCK_SRAM_SIZE);
   if (!options.legacyFirmware) {
-    sram.set(encodeSlotInfo(MOCK_KERNEL_HEADER_ADDRESS, MOCK_USERLAND_HEADER_ADDRESS), 0);
+    // Current firmware only fills in the userland header address.
+    sram.set(encodeSlotInfo(options.kernelInSlotInfo ? MOCK_KERNEL_HEADER_ADDRESS : 0, MOCK_USERLAND_HEADER_ADDRESS), 0);
   }
 
   return {

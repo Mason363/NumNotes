@@ -76,8 +76,6 @@
           return 'The calculator is busy. Close other tabs using it (like my.numworks.com) and try again.';
         case 'unsupported-model':
           return 'This calculator (N0100) can’t run third-party apps.';
-        case 'unsupported-firmware':
-          return 'Update the calculator at numworks.com/update first.';
         default:
           return e.message;
       }
@@ -210,7 +208,7 @@
   {:else if step === 'done'}
     <div class="center">
       <h3>Installed</h3>
-      <p class="muted">The calculator restarts. {project.name} is on its home screen.</p>
+      <p class="muted">{project.name} is on the calculator's home screen.</p>
     </div>
   {:else if step === 'error'}
     <div class="stack">

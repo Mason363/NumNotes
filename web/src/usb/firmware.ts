@@ -6,8 +6,10 @@ import type { InstalledApp } from './calculator';
 import { CalculatorError, FIRMWARE_TOO_OLD_MESSAGE } from './errors';
 import { decodeNwi } from './nwi';
 
-export const SLOT_INFO_MAGIC = 0xbadbeeef;
-export const KERNEL_HEADER_MAGIC = 0xf00dc0de;
+// Magics as the firmware's own C++ constants, read as little-endian u32s.
+// (Epsilon's README writes the slot info magic byte-wise, as BADBEEEF.)
+export const SLOT_INFO_MAGIC = 0xefeedbba;
+export const KERNEL_HEADER_MAGIC = 0xdec00df0;
 export const USERLAND_HEADER_MAGIC = 0xdec0edfe;
 export const APP_MAGIC = 0xdec0beba;
 /** "NMNT" as bytes. */
@@ -163,17 +165,45 @@ export function roundUpToAppAlignment(size: number): number {
   return Math.ceil(size / APP_ALIGNMENT) * APP_ALIGNMENT;
 }
 
-/** Reads the slot info from SRAM, then the kernel and userland headers from flash. */
+/** Where a userland header can sit: 64 KiB into a 4 MiB slot (128 KiB with
+ * extra data), possibly after an 8-byte signature prefix. */
+export const USERLAND_HEADER_CANDIDATES = [0x90000000, 0x90400000].flatMap((slot) =>
+  [0x10000, 0x10008, 0x20000, 0x20008].map((offset) => slot + offset),
+);
+
+const FLASH_START = 0x90000000;
+const FLASH_END = 0x90800000;
+const inFlash = (address: number) => address >= FLASH_START && address < FLASH_END;
+
+/**
+ * Reads the slot info from SRAM, then the userland header (and the kernel
+ * header, when the slot info points to it) from flash. Current firmware only
+ * fills in the userland header address.
+ */
 export async function readFirmwareInfo(
   readRam: MemoryReader,
   readFlash: MemoryReader,
   sramStart: number,
 ): Promise<FirmwareInfo> {
   const slot = parseSlotInfo(await readRam(sramStart, SLOT_INFO_SIZE));
-  if (!slot) throw new CalculatorError('unsupported-firmware', FIRMWARE_TOO_OLD_MESSAGE);
-  const kernel = parseKernelHeader(await readFlash(slot.kernelHeaderAddress, KERNEL_HEADER_SIZE));
-  const userland = parseUserlandHeader(await readFlash(slot.userlandHeaderAddress, USERLAND_HEADER_SIZE));
-  if (!kernel || !userland) throw new CalculatorError('unsupported-firmware', FIRMWARE_TOO_OLD_MESSAGE);
+  let userland: UserlandHeader | null = null;
+  if (slot && inFlash(slot.userlandHeaderAddress)) {
+    userland = parseUserlandHeader(await readFlash(slot.userlandHeaderAddress, USERLAND_HEADER_SIZE));
+  }
+  if (!userland) {
+    // No usable slot info: accept the userland header only if exactly one slot has one.
+    const found: UserlandHeader[] = [];
+    for (const address of USERLAND_HEADER_CANDIDATES) {
+      const header = parseUserlandHeader(await readFlash(address, USERLAND_HEADER_SIZE));
+      if (header?.externalAppsFlashStart !== undefined) found.push(header);
+    }
+    if (found.length === 1) userland = found[0];
+  }
+  if (!userland) throw new CalculatorError('unsupported-firmware', FIRMWARE_TOO_OLD_MESSAGE);
+  let kernel: KernelHeader | null = null;
+  if (slot && inFlash(slot.kernelHeaderAddress)) {
+    kernel = parseKernelHeader(await readFlash(slot.kernelHeaderAddress, KERNEL_HEADER_SIZE));
+  }
 
   const { externalAppsFlashStart, externalAppsFlashEnd } = userland;
   if (
@@ -187,8 +217,8 @@ export async function readFirmwareInfo(
     );
   }
   return {
-    firmwareVersion: kernel.version,
-    firmwarePatch: kernel.patch || undefined,
+    firmwareVersion: kernel?.version || userland.expectedVersion,
+    firmwarePatch: kernel?.patch || undefined,
     externalAppsFlashStart,
     externalAppsFlashEnd,
     externalAppsRamStart: userland.externalAppsRamStart,

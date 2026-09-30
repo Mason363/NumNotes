@@ -56,6 +56,26 @@ function isErased(bytes: Uint8Array): boolean {
   return bytes.every((byte) => byte === 0xff);
 }
 
+describe('firmware magics', () => {
+  // Bytes as they sit in the calculator's memory (little-endian C++ constants).
+  it('recognizes the slot info written by the firmware', () => {
+    const bytes = new Uint8Array([0xba, 0xdb, 0xee, 0xef, 0, 0, 0, 0, 0x00, 0x00, 0x01, 0x90, 0xba, 0xdb, 0xee, 0xef]);
+    expect(parseSlotInfo(bytes)).toEqual({ kernelHeaderAddress: 0, userlandHeaderAddress: 0x90010000 });
+  });
+
+  it('recognizes the kernel and userland headers', () => {
+    const kernel = new Uint8Array(24);
+    kernel.set([0xf0, 0x0d, 0xc0, 0xde], 0);
+    kernel.set(new TextEncoder().encode('24.4.0'), 4);
+    kernel.set([0xf0, 0x0d, 0xc0, 0xde], 20);
+    expect(parseKernelHeader(kernel)?.version).toBe('24.4.0');
+    const userland = new Uint8Array(48);
+    userland.set([0xfe, 0xed, 0xc0, 0xde], 0);
+    userland.set([0xfe, 0xed, 0xc0, 0xde], 44);
+    expect(parseUserlandHeader(userland)).not.toBeNull();
+  });
+});
+
 describe('parseMemoryLayout', () => {
   it('parses the NumWorks external flash layout', () => {
     const layout = parseMemoryLayout(EXTERNAL_FLASH_LAYOUT);
@@ -476,13 +496,10 @@ describe('install on the mock calculator', () => {
     expect(flashAt(calc.memory, snake.address, SECTOR)).toEqual(expected);
   });
 
-  it('rejects stores of non-NumNotes apps and firmware without slot info', async () => {
+  it('rejects stores of non-NumNotes apps', async () => {
     const calc = new MockCalculator();
     const [snake] = await calc.listApps();
     expect(await rejection(calc.readNotesStore(snake))).toMatchObject({ code: 'not-numnotes' });
-    expect(await rejection(new MockCalculator({ legacyFirmware: true }).info())).toMatchObject({
-      code: 'unsupported-firmware',
-    });
   });
 
   it('notifies disconnect listeners when rebooting', async () => {
@@ -659,7 +676,7 @@ describe('Calculator over a fake DfuSe device', () => {
       model: 'N0120',
       serial: '0042004A3438510C31363631',
       firmwareVersion: '23.2.0',
-      firmwarePatch: '1f3a9c2',
+      firmwarePatch: undefined,
       externalAppsFlashStart: APPS_START,
       externalAppsFlashEnd: APPS_END,
       externalAppsRamStart: 0x24020000,
@@ -712,10 +729,25 @@ describe('Calculator over a fake DfuSe device', () => {
     expect(error).toMatchObject({ code: 'unsupported-model' });
   });
 
-  it('rejects firmware without slot info', async () => {
+  it('finds the userland header without slot info', async () => {
     const { calc } = calculator({ memory: createMockMemory({ legacyFirmware: true }) });
+    const info = await calc.info();
+    expect(info.externalAppsFlashStart).toBe(APPS_START);
+    expect(info.firmwareVersion).toBe('23.2.0');
+  });
+
+  it('rejects a calculator whose software it can’t find', async () => {
+    const memory = createMockMemory({ legacyFirmware: true });
+    flashAt(memory, 0x90010008, 48).fill(0xff);
+    const { calc } = calculator({ memory });
     const error = await rejection(calc.info());
     expect(error).toMatchObject({ code: 'unsupported-firmware' });
-    expect(error.message).toMatch(/numworks\.com\/update/);
+  });
+
+  it('reads the kernel version when the slot info points to it', async () => {
+    const { calc } = calculator({ memory: createMockMemory({ kernelInSlotInfo: true, firmwareVersion: '24.1.0', firmwarePatch: 'abc1234' }) });
+    const info = await calc.info();
+    expect(info.firmwareVersion).toBe('24.1.0');
+    expect(info.firmwarePatch).toBe('abc1234');
   });
 });
