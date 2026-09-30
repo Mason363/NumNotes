@@ -382,7 +382,7 @@ export class Calculator extends FlashCalculator {
   protected async programFlash(address: number, data: Uint8Array, onProgress?: ProgressCallback): Promise<void> {
     await this.dfu.selectAlternate(ALT_FLASH);
     // writeFlash erased the range, so all-0xFF blocks are already in place.
-    await this.dfu.download(address, data, onProgress, { skipBlankBlocks: true });
+    await this.dfu.download(address, data, onProgress, { skipBlankBlocks: true, firstBlockLast: true });
   }
 
   protected async leaveDfu(address: number): Promise<void> {

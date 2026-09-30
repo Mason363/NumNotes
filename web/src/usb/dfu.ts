@@ -162,6 +162,12 @@ export interface DownloadOptions {
    * range was erased beforehand.
    */
   skipBlankBlocks?: boolean;
+  /**
+   * Write the first block after all the others. An app's header (with its
+   * magic) sits in the first block, so an interrupted install leaves no
+   * half-written app for the calculator to list and run.
+   */
+  firstBlockLast?: boolean;
 }
 
 const DFU_INTERFACE_CLASS = 0xfe;
@@ -341,7 +347,13 @@ export class DfuClient {
     await this.runCommand(commandPayload(DFUSE_ERASE_SECTOR, address), `Erasing the sector at ${formatAddress(address)}`);
   }
 
-  /** Writes `data` at `address`. The target must already be erased. */
+  /**
+   * Writes `data` at `address`. The target must already be erased.
+   *
+   * NumWorks' DFU code resets its address pointer to 0 after every executed
+   * block (it clears the pending pointer to 0 instead of "none"), so each
+   * block gets its own SET_ADDRESS and is sent as block 2.
+   */
   async download(
     address: number,
     data: Uint8Array,
@@ -354,21 +366,16 @@ export class DfuClient {
       return;
     }
     await this.ensureIdle();
-    for (let first = 0; first < blockCount; first += MAX_BLOCKS_PER_POINTER) {
-      const last = Math.min(blockCount, first + MAX_BLOCKS_PER_POINTER);
-      let pointerSet = false;
-      for (let block = first; block < last; block++) {
-        const offset = block * this.transferSize;
-        const chunk = data.subarray(offset, Math.min(offset + this.transferSize, data.length));
-        if (!options.skipBlankBlocks || !isBlank(chunk)) {
-          if (!pointerSet) {
-            await this.setAddressPointer(address + first * this.transferSize);
-            pointerSet = true;
-          }
-          await this.writeBlock(FIRST_DATA_BLOCK + block - first, chunk, address + offset);
-        }
-        onProgress?.((block + 1) / blockCount);
+    const order = [...Array(blockCount).keys()];
+    if (options.firstBlockLast) order.push(order.shift()!);
+    for (const [done, block] of order.entries()) {
+      const offset = block * this.transferSize;
+      const chunk = data.subarray(offset, Math.min(offset + this.transferSize, data.length));
+      if (!options.skipBlankBlocks || !isBlank(chunk)) {
+        await this.setAddressPointer(address + offset);
+        await this.writeBlock(FIRST_DATA_BLOCK, chunk, address + offset);
       }
+      onProgress?.((done + 1) / blockCount);
     }
   }
 

@@ -53,6 +53,9 @@ export class FakeDfuDevice implements USBDevice {
   state: number = DfuState.idle;
   status: number = DfuStatus.ok;
   addressPointer = 0;
+  /** Epsilon applies SET_ADDRESS after the next busy step, then leaves this at
+   * 0 rather than "none", so every later block moves the pointer back to 0. */
+  private pendingPointer: number | null = null;
   alternateSetting = 0;
   claimed = false;
 
@@ -60,6 +63,8 @@ export class FakeDfuDevice implements USBDevice {
   readonly log: { request: number; value: number; length: number }[] = [];
   readonly erasedSectors: number[] = [];
   writtenBlocks = 0;
+  /** Start address of every block written, in order. */
+  readonly writtenAddresses: number[] = [];
   pollViolations = 0;
   massEraseRequested = false;
   /** Set once the device left DFU mode; it is then gone from the bus. */
@@ -263,6 +268,10 @@ export class FakeDfuDevice implements USBDevice {
     } else {
       outcome = this.writeBlock(pending.blockNumber, pending.data);
     }
+    if (this.pendingPointer !== null) {
+      this.addressPointer = this.pendingPointer;
+      this.pendingPointer = 0;
+    }
     this.afterBusy =
       outcome.status === DfuStatus.ok
         ? { state: DfuState.downloadIdle, status: DfuStatus.ok }
@@ -273,7 +282,7 @@ export class FakeDfuDevice implements USBDevice {
   private executeCommand(payload: Uint8Array): { status: number; pollTimeout: number } {
     const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
     if (payload[0] === 0x21 && payload.length === 5) {
-      this.addressPointer = view.getUint32(1, true);
+      this.pendingPointer = view.getUint32(1, true);
       return { status: DfuStatus.ok, pollTimeout: 0 };
     }
     if (payload[0] === 0x41 && payload.length === 1) {
@@ -313,6 +322,7 @@ export class FakeDfuDevice implements USBDevice {
       region.bytes[offset + i] = isFlash ? region.bytes[offset + i] & data[i] : data[i];
     }
     this.writtenBlocks++;
+    this.writtenAddresses.push(address);
     return { status: DfuStatus.ok, pollTimeout: this.writePollTimeout };
   }
 

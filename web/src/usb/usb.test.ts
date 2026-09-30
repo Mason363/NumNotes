@@ -611,6 +611,16 @@ describe('DfuClient against a fake DfuSe device', () => {
     expect(device.pollViolations).toBe(0);
   });
 
+  it('re-aims every block, since the calculator resets its address pointer', async () => {
+    const { device, client } = await openClient();
+    await client.selectAlternate(0);
+    await client.eraseSector(0x90260000);
+    const data = new Uint8Array(3 * 2048).map((_, i) => (i * 7) & 0xff);
+    await client.download(0x90260000, data, undefined, { firstBlockLast: true });
+    expect(device.writtenAddresses).toEqual([0x90260800, 0x90261000, 0x90260000]);
+    expect(flashAt(device.memory, 0x90260000, data.length)).toEqual(data);
+  });
+
   it('reports and clears a device error', async () => {
     const { device, client } = await openClient();
     await client.selectAlternate(0);
