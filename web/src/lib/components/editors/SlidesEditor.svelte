@@ -140,23 +140,22 @@
     min-height: 0;
     display: grid;
     place-items: center;
-    background: var(--bg);
-    background-image: radial-gradient(var(--line) 1px, transparent 1px);
+    background: var(--layout);
+    background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
     background-size: 16px 16px;
     overflow: hidden;
   }
   .stage-area :global(.stage) {
-    box-shadow: var(--shadow-lg);
-    border-radius: 2px;
+    box-shadow: 0 2px 12px rgba(38, 44, 80, 0.12);
   }
   .strip {
     display: flex;
     gap: 12px;
-    padding: 12px 16px 14px;
+    padding: 12px 16px 12px;
     overflow-x: auto;
     border-top: 1px solid var(--line);
-    background: var(--panel);
     align-items: flex-start;
+    flex: none;
   }
   .thumb-wrap {
     position: relative;
@@ -165,36 +164,39 @@
   .thumb-wrap.drop-before::before {
     content: '';
     position: absolute;
-    left: -7px;
+    left: -8px;
     top: 0;
-    bottom: 16px;
+    bottom: 18px;
     width: 3px;
-    border-radius: 3px;
-    background: var(--accent);
+    border-radius: 2px;
+    background: var(--purple);
   }
   .thumb {
     padding: 0;
-    border: none;
-    border-radius: 2px;
+    border: 2px solid var(--line);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     display: block;
-    box-shadow: 0 0 0 1px var(--line-strong);
     background: transparent;
   }
+  .thumb:hover {
+    border-color: var(--card-hover);
+  }
   .thumb.on {
-    box-shadow: 0 0 0 2.5px var(--accent);
+    border-color: var(--accent);
   }
   .num {
     display: block;
     text-align: center;
-    font-size: 11.5px;
-    color: var(--dim);
-    margin-top: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--label);
+    margin-top: 4px;
   }
   .thumb-actions {
     position: absolute;
-    top: 4px;
-    right: 4px;
+    top: 5px;
+    right: 5px;
     display: flex;
     gap: 3px;
     opacity: 0;
@@ -207,25 +209,28 @@
     width: 22px;
     height: 22px;
     border: none;
-    border-radius: 2px;
+    border-radius: 50%;
     display: grid;
     place-items: center;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
+    background: var(--panel);
+    color: var(--label);
+    box-shadow: var(--shadow);
+  }
+  .thumb-actions button:hover {
+    color: var(--purple);
   }
   .new {
     flex: none;
-    width: 96px;
-    height: 72px;
-    border-radius: 2px;
-    border: 1px dashed var(--line-strong);
-    background: transparent;
-    color: var(--dim);
+    width: 100px;
+    height: 76px;
+    border-radius: var(--radius-sm);
+    border: 2px dashed var(--card-hover);
+    background: var(--layout);
+    color: var(--purple);
     display: grid;
     place-items: center;
   }
   .new:hover {
-    border-color: var(--accent);
-    color: var(--accent-text);
+    border-color: var(--purple);
   }
 </style>

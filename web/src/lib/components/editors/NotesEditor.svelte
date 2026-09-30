@@ -49,7 +49,7 @@
     overflow: auto;
     padding: 24px;
     display: grid;
-    gap: 18px;
+    gap: 16px;
     align-content: start;
     max-width: 720px;
     width: 100%;
@@ -57,10 +57,12 @@
   }
   .intro {
     display: grid;
-    gap: 8px;
-    padding: 16px;
-    border-radius: 2px;
-    background: var(--accent-soft);
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--label);
+    font-size: 13px;
   }
   .list {
     display: grid;
@@ -72,15 +74,19 @@
   textarea {
     width: 100%;
     resize: vertical;
-    border: 1px solid var(--line);
-    border-radius: 2px;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
     padding: 12px 40px 12px 14px;
-    background: var(--panel);
+    background: var(--layout);
     font-size: 14px;
     line-height: 1.45;
   }
+  textarea:hover {
+    border-color: var(--card);
+  }
   textarea:focus {
     border-color: var(--accent);
+    background: var(--panel);
     outline: none;
   }
   .del {
@@ -90,12 +96,15 @@
     border: none;
     background: transparent;
     color: var(--faint);
-    padding: 4px;
-    border-radius: 2px;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
   }
   .del:hover {
     color: var(--danger);
-    background: var(--hover);
+    background: var(--panel);
   }
   .add {
     display: flex;
@@ -103,14 +112,14 @@
     justify-content: center;
     gap: 6px;
     height: 44px;
-    border: 1px dashed var(--line-strong);
-    border-radius: 2px;
+    border: 2px dashed var(--card-hover);
+    border-radius: var(--radius);
     background: transparent;
-    color: var(--dim);
-    font-weight: 560;
+    color: var(--purple);
+    font-weight: 700;
+    font-size: 13px;
   }
   .add:hover {
-    border-color: var(--accent);
-    color: var(--accent-text);
+    border-color: var(--purple);
   }
 </style>

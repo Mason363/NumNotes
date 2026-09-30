@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { ChevronDown, Redo2, Undo2 } from '@lucide/svelte';
   import Button from '../ui/Button.svelte';
+  import IconButton from '../ui/IconButton.svelte';
   import Menu from '../ui/Menu.svelte';
+  import HelpDialog from './HelpDialog.svelte';
   import IconDialog from './IconDialog.svelte';
   import InstallDialog from './InstallDialog.svelte';
   import StorageMeter from './StorageMeter.svelte';
@@ -14,6 +17,7 @@
   let downloadMenu = $state(false);
   let iconOpen = $state(false);
   let installOpen = $state(false);
+  let helpOpen = $state(false);
   let busy = $state(false);
 
   const project = $derived(store.project!);
@@ -92,28 +96,38 @@
 </script>
 
 <header class="topbar">
+  <a class="brand" href={import.meta.env.BASE_URL} onclick={(e) => { e.preventDefault(); store.project = null; }} title="All apps">
+    <img src="{import.meta.env.BASE_URL}favicon.svg" alt="" />
+    <span class="word">NumNotes</span>
+  </a>
+
+  <span class="divider"></span>
+
   <Menu open={projectMenu} onclose={() => (projectMenu = false)}>
     {#snippet trigger()}
-      <button class="brand" onclick={() => (projectMenu = !projectMenu)} aria-haspopup="menu">
-        <img src="{import.meta.env.BASE_URL}favicon.svg" alt="" />
-        <span class="word">NumNotes</span>
-        <span class="caret">▾</span>
-      </button>
+      <button class="apps" onclick={() => (projectMenu = !projectMenu)} aria-haspopup="menu">My apps <ChevronDown size={14} strokeWidth={2.5} /></button>
     {/snippet}
-    <button class="item" onclick={() => { projectMenu = false; store.project = null; }}>New app…</button>
-    <button class="item" onclick={openFile}>Open .numnotes file…</button>
+    <button class="item" onclick={() => { projectMenu = false; store.project = null; }}>New app</button>
+    <button class="item" onclick={openFile}>Open a .numnotes file</button>
     <button class="item" onclick={duplicate}>Duplicate this app</button>
     <button class="item" onclick={removeProject}>Delete this app</button>
-    <div class="sep"></div>
-    <button class="item" onclick={() => { projectMenu = false; downloadNwa(); }}>Download .nwa</button>
-    <button class="item" onclick={() => { projectMenu = false; downloadProject(); }}>Download project file</button>
     {#if store.projects.length > 1}
       <div class="sep"></div>
+      <div class="menu-label">Switch to</div>
       {#each store.projects.filter((p) => p.id !== project.id).slice(0, 8) as p (p.id)}
         <button class="item" onclick={() => switchTo(p.id)}>{p.name}</button>
       {/each}
     {/if}
   </Menu>
+
+  <span class="divider history-sep"></span>
+
+  <div class="history">
+    <IconButton label="Undo (⌘Z)" disabled={!store.canUndo} onclick={() => store.undo()}><Undo2 strokeWidth={1.75} /></IconButton>
+    <IconButton label="Redo (⇧⌘Z)" disabled={!store.canRedo} onclick={() => store.redo()}><Redo2 strokeWidth={1.75} /></IconButton>
+  </div>
+
+  <span class="divider history-sep"></span>
 
   <div class="identity">
     <button class="icon-btn" title="Change the app icon" onclick={() => (iconOpen = true)}>
@@ -134,16 +148,13 @@
 
   <div class="spacer"></div>
 
-  <div class="history">
-    <button class="text-btn" title="Undo (⌘Z)" disabled={!store.canUndo} onclick={() => store.undo()}>Undo</button>
-    <button class="text-btn" title="Redo (⇧⌘Z)" disabled={!store.canRedo} onclick={() => store.redo()}>Redo</button>
-  </div>
-
   <div class="meter-slot"><StorageMeter /></div>
+
+  <button class="help" title="Keys on the calculator" aria-label="Help" onclick={() => (helpOpen = true)}>?</button>
 
   <div class="dl"><Menu open={downloadMenu} align="right" onclose={() => (downloadMenu = false)}>
     {#snippet trigger()}
-      <Button onclick={() => (downloadMenu = !downloadMenu)} disabled={busy} aria-haspopup="menu">Download ▾</Button>
+      <Button size="sm" onclick={() => (downloadMenu = !downloadMenu)} disabled={busy} aria-haspopup="menu">Download <ChevronDown strokeWidth={2.5} /></Button>
     {/snippet}
     <button class="item" onclick={downloadNwa}>
       <span>App file (.nwa)<span class="desc">For my.numworks.com/apps</span></span>
@@ -153,110 +164,136 @@
     </button>
   </Menu></div>
 
-  <Button variant="primary" onclick={() => (installOpen = true)}>Send<span class="long">&nbsp;to calculator</span></Button>
+  <Button size="sm" variant="primary" onclick={() => (installOpen = true)}>Send<span class="long">&nbsp;to calculator</span></Button>
 </header>
 
 <IconDialog open={iconOpen} onclose={() => (iconOpen = false)} />
+<HelpDialog open={helpOpen} onclose={() => (helpOpen = false)} />
 <InstallDialog open={installOpen} onclose={() => (installOpen = false)} ondownload={downloadNwa} />
 
 <style>
   .topbar {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 10px;
-    height: 46px;
+    gap: 10px;
+    padding: 0 16px 0 14px;
+    height: 48px;
     background: var(--panel);
-    border-bottom: 1px solid var(--line-strong);
     min-width: 0;
   }
   .brand {
     display: flex;
     align-items: center;
-    gap: 7px;
-    border: none;
-    background: transparent;
-    padding: 4px 6px;
-    height: 34px;
-    border-radius: var(--radius-sm);
-  }
-  .brand:hover {
-    background: var(--hover);
+    gap: 8px;
+    color: var(--text);
+    text-decoration: none;
   }
   .brand img {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
   }
   .word {
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.01em;
   }
-  .caret {
-    font-size: 10px;
+  .divider {
+    width: 1px;
+    height: 22px;
+    background: var(--line-strong);
+    flex: none;
+  }
+  .apps {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    padding: 6px 4px;
+    font-size: 12px;
+    font-weight: 700;
     color: var(--dim);
+  }
+  .apps:hover {
+    color: var(--text);
+  }
+  .history {
+    display: flex;
+    gap: 2px;
   }
   .identity {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding-left: 10px;
-    border-left: 1px solid var(--line);
     min-width: 0;
   }
   .icon-btn {
-    border: 1px solid transparent;
-    padding: 1px;
+    border: none;
+    padding: 2px;
     background: transparent;
     display: grid;
+    border-radius: var(--radius-sm);
   }
   .icon-btn:hover {
-    border-color: var(--line-strong);
+    background: var(--hover);
   }
   .name {
     border: 1px solid transparent;
     background: transparent;
-    padding: 4px 6px;
-    font-size: 14px;
-    font-weight: 650;
-    width: 200px;
+    padding: 4px 8px;
+    font-size: 15px;
+    font-weight: 700;
+    width: 220px;
     min-width: 80px;
     border-radius: var(--radius-sm);
+    color: var(--text);
   }
   .name:hover {
-    border-color: var(--line);
+    background: var(--layout);
   }
   .name:focus {
-    border-color: var(--text);
+    background: var(--panel);
+    border-color: var(--purple);
     outline: none;
   }
   .spacer {
     flex: 1;
   }
-  .history {
-    display: flex;
-  }
-  .text-btn {
-    border: none;
+  /* Round outlined help button, as on the Board. */
+  .help {
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border: 1.5px solid var(--label);
+    border-radius: 50%;
     background: transparent;
-    padding: 4px 8px;
-    font-size: 12.5px;
-    color: var(--text);
-    border-radius: var(--radius-sm);
+    color: var(--label);
+    font-size: 14px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
   }
-  .text-btn:hover:not(:disabled) {
-    background: var(--hover);
+  .help:hover {
+    border-color: var(--purple);
+    color: var(--purple);
   }
-  .text-btn:disabled {
-    color: var(--faint);
-    cursor: default;
+  .topbar :global(.btn svg) {
+    width: 14px;
+    height: 14px;
   }
-  @media (max-width: 1000px) {
+  @media (max-width: 1100px) {
     .word {
       display: none;
     }
   }
   @media (max-width: 640px) {
+    .topbar {
+      gap: 6px;
+      padding: 0 10px;
+    }
     .history,
+    .history-sep,
+    .help,
     .dl,
     .meter-slot,
     .long {

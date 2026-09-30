@@ -30,37 +30,35 @@
 </div>
 
 <style>
-.seg {
+  .seg {
     display: inline-flex;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm);
+    gap: 2px;
+    padding: 2px;
+    border-radius: var(--pill);
+    background: var(--field);
     width: 100%;
-    overflow: hidden;
   }
   button {
     flex: 1;
     border: none;
-    border-left: 1px solid var(--line-strong);
-    background: var(--panel);
-    height: 26px;
-    padding: 0 8px;
+    border-radius: var(--pill);
+    background: transparent;
+    height: 28px;
+    padding: 0 10px;
     font-size: 12px;
-    font-weight: 550;
-    color: var(--dim);
+    font-weight: 700;
+    color: var(--label);
     white-space: nowrap;
-  }
-  button:first-child {
-    border-left: none;
+    transition: background-color 0.12s, color 0.12s;
   }
   .small button {
     height: 24px;
   }
-  button:hover {
+  button:hover:not(.on) {
     background: var(--hover);
   }
   button.on {
     background: var(--accent);
     color: var(--on-accent);
-    font-weight: 650;
   }
 </style>

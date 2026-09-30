@@ -7,10 +7,10 @@
   let { checked = $bindable(), label, onchange }: Props = $props();
 </script>
 
-<!-- A plain square checkbox: on/off settings read like a settings screen. -->
 <input
   type="checkbox"
-  class="check"
+  class="switch"
+  role="switch"
   {checked}
   aria-label={label}
   onchange={(e) => {
@@ -20,29 +20,34 @@
 />
 
 <style>
-  .check {
+  .switch {
     appearance: none;
-    width: 16px;
-    height: 16px;
+    position: relative;
+    width: 30px;
+    height: 18px;
     margin: 0;
-    border: 1px solid var(--line-strong);
-    border-radius: 1px;
-    background: var(--panel);
-    display: grid;
-    place-items: center;
+    border-radius: 9px;
+    background: #a1a1a1;
     cursor: pointer;
     flex: none;
+    transition: background-color 0.15s;
   }
-  .check:checked {
-    background: var(--accent);
-    border-color: var(--accent-strong);
-  }
-  .check:checked::after {
+  .switch::after {
     content: '';
-    width: 4px;
-    height: 8px;
-    border: solid var(--on-accent);
-    border-width: 0 2px 2px 0;
-    transform: translateY(-1px) rotate(45deg);
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s;
+  }
+  .switch:checked {
+    background: var(--accent);
+  }
+  .switch:checked::after {
+    transform: translateX(12px);
   }
 </style>

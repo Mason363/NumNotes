@@ -26,38 +26,40 @@
 </div>
 
 <style>
-.colors {
+  .colors {
     display: flex;
     flex-wrap: wrap;
-    gap: 3px;
+    gap: 6px;
   }
   .swatch {
-    width: 20px;
-    height: 20px;
-    border-radius: 1px;
-    border: 1px solid rgba(0, 0, 0, 0.18);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.12);
     background: var(--c);
     padding: 0;
     position: relative;
   }
   .swatch.on {
-    outline: 2px solid var(--text);
-    outline-offset: 1px;
+    box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
   }
   .none {
-    background: linear-gradient(135deg, transparent 45%, var(--danger) 45%, var(--danger) 55%, transparent 55%), var(--panel);
+    background: linear-gradient(135deg, transparent 45%, var(--danger) 45%, var(--danger) 55%, transparent 55%), #fff;
   }
   .custom {
-    background: var(--panel);
+    background: var(--field);
     cursor: pointer;
     overflow: hidden;
     display: grid;
     place-items: center;
+    border-style: dashed;
+    border-color: var(--line-strong);
   }
   .custom::after {
     content: '+';
-    font-size: 13px;
-    color: var(--dim);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--label);
     pointer-events: none;
     position: absolute;
   }

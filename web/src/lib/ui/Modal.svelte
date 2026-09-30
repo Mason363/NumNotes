@@ -31,7 +31,7 @@
   <div class="box">
     <header>
       <h2>{title}</h2>
-      <button class="close" aria-label="Close" onclick={() => onclose?.()}><X size={18} /></button>
+      <button class="close" aria-label="Close" onclick={() => onclose?.()}><X size={16} strokeWidth={2.5} /></button>
     </header>
     <div class="body">{@render children()}</div>
     {#if footer}<footer>{@render footer()}</footer>{/if}
@@ -39,7 +39,7 @@
 </dialog>
 
 <style>
-dialog {
+  dialog {
     border: none;
     padding: 0;
     background: transparent;
@@ -48,54 +48,50 @@ dialog {
     color: var(--text);
   }
   dialog::backdrop {
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(30, 33, 56, 0.4);
   }
   .box {
     background: var(--panel);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 48px);
+    overflow: hidden;
   }
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 6px 0 14px;
-    height: 36px;
-    background: var(--accent);
-    color: var(--on-accent);
+    padding: 16px 16px 4px 20px;
   }
   h2 {
-    font-size: 12px;
+    font-size: 18px;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    color: var(--text);
   }
   .close {
     border: none;
-    background: transparent;
-    color: inherit;
+    border-radius: 50%;
+    background: var(--layout);
+    color: var(--label);
     width: 28px;
     height: 28px;
     display: grid;
     place-items: center;
   }
   .close:hover {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--card);
   }
   .body {
-    padding: 16px;
+    padding: 12px 20px 20px;
     overflow: auto;
   }
   footer {
     display: flex;
     justify-content: flex-end;
-    gap: 6px;
-    padding: 10px 16px;
-    border-top: 1px solid var(--line);
-    background: var(--panel-2);
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--layout);
   }
 </style>

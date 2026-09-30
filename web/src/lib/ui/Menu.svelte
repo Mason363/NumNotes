@@ -36,21 +36,21 @@
 </div>
 
 <style>
-.menu-root {
+  .menu-root {
     position: relative;
     display: inline-flex;
   }
   .menu {
     position: absolute;
-    top: calc(100% + 2px);
+    top: calc(100% + 6px);
     z-index: 50;
-    min-width: 220px;
+    min-width: 230px;
     background: var(--panel);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
-    padding: 2px 0;
+    padding: 6px;
     display: grid;
+    gap: 1px;
   }
   .left {
     left: 0;
@@ -64,27 +64,38 @@
     gap: 10px;
     width: 100%;
     border: none;
+    border-radius: var(--radius-sm);
     background: transparent;
-    padding: 6px 12px;
+    padding: 7px 10px;
     text-align: left;
     font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
   }
   .menu :global(.item:hover) {
-    background: var(--accent-soft);
+    background: var(--hover);
   }
   .menu :global(.item svg) {
-    width: 14px;
-    height: 14px;
-    color: var(--dim);
+    width: 16px;
+    height: 16px;
+    color: var(--purple);
+    flex: none;
   }
   .menu :global(.item .desc) {
     display: block;
-    font-size: 11.5px;
+    font-size: 12px;
+    font-weight: 400;
     color: var(--dim);
   }
   .menu :global(.sep) {
     height: 1px;
     background: var(--line);
-    margin: 2px 0;
+    margin: 4px 6px;
+  }
+  .menu :global(.menu-label) {
+    padding: 6px 10px 2px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dim);
   }
 </style>

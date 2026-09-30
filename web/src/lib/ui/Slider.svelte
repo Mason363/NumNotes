@@ -30,7 +30,7 @@
 </div>
 
 <style>
-.slider {
+  .slider {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -39,30 +39,34 @@
   input {
     flex: 1;
     appearance: none;
-    height: 3px;
-    background: linear-gradient(to right, var(--text) var(--pct), var(--line-strong) var(--pct));
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--accent) var(--pct), var(--field) var(--pct));
     min-width: 60px;
+    cursor: pointer;
   }
   input::-webkit-slider-thumb {
     appearance: none;
-    width: 10px;
+    width: 16px;
     height: 16px;
-    border-radius: 1px;
-    background: var(--panel);
-    border: 1px solid var(--text);
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
   input::-moz-range-thumb {
-    width: 10px;
-    height: 16px;
-    border-radius: 1px;
-    background: var(--panel);
-    border: 1px solid var(--text);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent);
   }
   .value {
     min-width: 40px;
     text-align: right;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--dim);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
+    font-variant-numeric: tabular-nums;
   }
 </style>

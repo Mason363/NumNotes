@@ -92,11 +92,11 @@ void glyph_draw(gfx_t *g, const nn_font_t *font, int glyph, int pen_x16,
     dst.w = gl->w;
     dst.h = gl->h;
   } else {
-    /* pen_x16 and baseline are already in screen space; scale the offsets. */
-    int x0 = (pen_x16 + 8) / 16 + (int)(((int64_t)gl->bx * zoom) >> 16);
+    /* pen_x16 and baseline are already in screen space; scale the offsets.
+     * Edges are rounded once, from sixteenths, so spacing stays even. */
+    int x0 = (pen_x16 + (int)(((int64_t)gl->bx * zoom) >> 12) + 8) >> 4;
     int y0 = baseline - (int)(((int64_t)gl->by * zoom + 32768) >> 16);
-    int x1 = (pen_x16 + 8) / 16 +
-             (int)(((int64_t)(gl->bx + gl->w) * zoom + 32768) >> 16);
+    int x1 = (pen_x16 + (int)(((int64_t)(gl->bx + gl->w) * zoom) >> 12) + 8) >> 4;
     int y1 = y0 + (int)(((int64_t)gl->h * zoom + 32768) >> 16);
     dst.x = x0;
     dst.y = y0;

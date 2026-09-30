@@ -38,89 +38,91 @@
           {/each}
         </dl>
       {/if}
-      <button class="close" onclick={() => (open = false)}>Close</button>
+      <button class="text-link close" onclick={() => (open = false)}>Close</button>
     </div>
   {/if}
 </div>
 
 <style>
-.meter-root {
+  .meter-root {
     position: relative;
   }
   .meter {
     display: flex;
     align-items: center;
     gap: 8px;
-    border: 1px solid var(--line-strong);
-    background: var(--panel);
-    border-radius: var(--radius-sm);
-    height: 30px;
-    padding: 0 8px;
+    border: none;
+    background: transparent;
+    border-radius: var(--pill);
+    height: 32px;
+    padding: 0 10px;
   }
   .meter:hover {
-    background: var(--hover);
+    background: var(--layout);
   }
   .bar {
-    width: 70px;
-    height: 8px;
-    border: 1px solid var(--line-strong);
-    background: var(--panel-2);
+    width: 72px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--card);
+    overflow: hidden;
   }
   .fill {
     display: block;
     height: 100%;
-    background: var(--text);
+    border-radius: 3px;
+    background: var(--purple);
   }
   .fill.high {
-    background: var(--accent-strong);
+    background: var(--accent);
   }
   .fill.over {
     background: var(--danger);
   }
   .text {
-    font-family: var(--mono);
-    font-size: 11.5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
+    font-variant-numeric: tabular-nums;
   }
   .of {
     color: var(--faint);
   }
   .spinner {
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    animation: blink 0.8s steps(2) infinite;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--card);
+    border-top-color: var(--purple);
+    animation: spin 0.8s linear infinite;
   }
-  @keyframes blink {
+  @keyframes spin {
     to {
-      opacity: 0;
+      transform: rotate(360deg);
     }
   }
   .pop {
     position: absolute;
     right: 0;
-    top: calc(100% + 2px);
+    top: calc(100% + 6px);
     width: 290px;
     z-index: 40;
     background: var(--panel);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
-    padding: 12px 14px;
+    padding: 14px 16px;
     display: grid;
     gap: 8px;
   }
   h3 {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: 600;
   }
   h4 {
-    font-size: 11px;
-    color: var(--dim);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
     margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
   dl {
     margin: 0;
@@ -130,9 +132,9 @@
   dl div {
     display: flex;
     justify-content: space-between;
-    font-size: 12.5px;
-    border-bottom: 1px dotted var(--line);
-    padding: 2px 0;
+    font-size: 12px;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--line);
   }
   dt {
     color: var(--dim);
@@ -142,15 +144,12 @@
   }
   dd {
     margin: 0;
-    font-family: var(--mono);
-    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--label);
+    font-variant-numeric: tabular-nums;
   }
   .close {
     justify-self: end;
-    border: 1px solid var(--line-strong);
-    background: var(--panel);
-    padding: 3px 10px;
-    font-size: 12px;
   }
   @media (max-width: 760px) {
     .bar {

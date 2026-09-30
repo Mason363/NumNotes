@@ -78,7 +78,7 @@
 <style>
   .gallery {
     overflow: auto;
-    padding: 24px;
+    padding: 20px;
     flex: 1;
   }
   .grid {
@@ -91,29 +91,30 @@
     position: relative;
     display: grid;
     gap: 6px;
-    border-radius: 2px;
   }
   figure.drop-before::before {
     content: '';
     position: absolute;
-    left: -8px;
+    left: -9px;
     top: 0;
     bottom: 0;
     width: 3px;
-    border-radius: 3px;
-    background: var(--accent);
+    border-radius: 2px;
+    background: var(--purple);
   }
   .thumb {
     aspect-ratio: 1;
-    border: none;
+    border: 2px solid transparent;
     padding: 0;
-    border-radius: 2px;
+    border-radius: var(--radius);
     overflow: hidden;
-    background: var(--hover);
-    box-shadow: none;
+    background: var(--layout);
+  }
+  .thumb:hover {
+    border-color: var(--card-hover);
   }
   .selected .thumb {
-    box-shadow: 0 0 0 3px var(--accent);
+    border-color: var(--accent);
   }
   .thumb img {
     width: 100%;
@@ -124,40 +125,50 @@
   .caption {
     border: 1px solid transparent;
     background: transparent;
-    font-size: 12.5px;
-    padding: 3px 6px;
-    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--label);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
   }
-  .caption:hover,
+  .caption:hover {
+    background: var(--layout);
+  }
   .caption:focus {
-    border-color: var(--line);
+    border-color: var(--purple);
     background: var(--panel);
     outline: none;
   }
   .del {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 8px;
+    right: 8px;
     border: none;
     width: 26px;
     height: 26px;
-    border-radius: 2px;
+    border-radius: 50%;
     display: grid;
     place-items: center;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
+    background: var(--panel);
+    color: var(--label);
+    box-shadow: var(--shadow);
     opacity: 0;
     transition: opacity 0.15s;
+  }
+  .del:hover {
+    color: var(--danger);
   }
   figure:hover .del {
     opacity: 1;
   }
   .add,
   .empty {
-    border: 1px dashed var(--line-strong);
-    border-radius: 2px;
-    background: transparent;
-    color: var(--dim);
+    border: 2px dashed var(--card-hover);
+    border-radius: var(--radius);
+    background: var(--layout);
+    color: var(--purple);
+    font-weight: 700;
+    font-size: 13px;
     display: grid;
     place-items: center;
     align-content: center;
@@ -168,9 +179,7 @@
   }
   .add:hover,
   .empty:hover {
-    border-color: var(--accent);
-    color: var(--accent-text);
-    background: var(--accent-soft);
+    border-color: var(--purple);
   }
   .empty {
     width: 100%;

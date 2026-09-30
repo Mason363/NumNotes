@@ -94,9 +94,14 @@
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 2px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    background: var(--layout);
+    cursor: pointer;
+  }
+  input {
+    accent-color: var(--accent);
+    margin-top: 3px;
   }
   pre {
     margin: 0;
@@ -107,8 +112,9 @@
   .warning {
     display: flex;
     gap: 10px;
-    padding: 12px;
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--danger) 9%, transparent);
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: #f2dede;
+    color: #a94442;
   }
 </style>

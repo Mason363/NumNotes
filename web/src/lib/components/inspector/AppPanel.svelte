@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChevronRight } from '@lucide/svelte';
   import type { AppSettings, Theme } from '../../../model/types.ts';
   import { FAMILY_LABELS } from '../../../pack/fonts.ts';
   import ColorInput from '../../ui/ColorInput.svelte';
@@ -40,20 +41,20 @@
     </div>
   </Field>
   <Field label="Accent">
-    <ColorInput value={project.theme.accent} swatches={['#f28c28', '#e5484d', '#d6409f', '#8e4ec6', '#3f6ff5', '#0091c2', '#2fa84f', '#c79a00', '#1c1c1f']} onchange={(c) => c && setTheme({ accent: c })} />
+    <ColorInput value={project.theme.accent} swatches={['#ffb734', '#e5484d', '#d6409f', '#8e4ec6', '#7a81ff', '#3f6ff5', '#0091c2', '#2fa84f', '#1c1c1f']} onchange={(c) => c && setTheme({ accent: c })} />
   </Field>
   <Field label="Font">
-    <select class="text" value={project.theme.font} onchange={(e) => setTheme({ font: (e.currentTarget as HTMLSelectElement).value as Theme['font'] })}>
+    <select class="field-input" value={project.theme.font} onchange={(e) => setTheme({ font: (e.currentTarget as HTMLSelectElement).value as Theme['font'] })}>
       {#each Object.entries(FAMILY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}
     </select>
   </Field>
-  <button class="disclosure" onclick={() => (advanced = !advanced)} aria-expanded={advanced}>{advanced ? '▾' : '▸'} Custom colors</button>
+  <button class="text-link disclosure" onclick={() => (advanced = !advanced)} aria-expanded={advanced}><ChevronRight size={14} strokeWidth={2.5} />Custom colors</button>
   {#if advanced}
     <Field label="Background"><ColorInput value={project.theme.background} onchange={(c) => c && setTheme({ preset: 'custom', background: c })} /></Field>
     <Field label="Text"><ColorInput value={project.theme.text} onchange={(c) => c && setTheme({ preset: 'custom', text: c })} /></Field>
   {/if}
 
-  <h3>Calculator</h3>
+  <h3 class="group-title">Calculator</h3>
   <Field label="Opens to">
     <Segmented
       value={project.settings.start}
@@ -78,14 +79,10 @@
 <style>
   .panel {
     display: grid;
-    gap: 14px;
+    gap: 16px;
   }
   h3 {
-    font-size: 13px;
-    color: var(--dim);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .presets {
     display: grid;
@@ -94,35 +91,32 @@
     width: 100%;
   }
   .preset {
-    border: 1px solid var(--line-strong);
-    border-radius: 2px;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
     padding: 0 0 8px;
     overflow: hidden;
     display: grid;
     gap: 6px;
-    font-size: 12.5px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   }
   .preset.on {
-    box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent);
+    border-color: var(--accent);
   }
   .bar {
-    height: 8px;
-  }
-  .text {
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    padding: 6px 8px;
-    background: var(--panel);
-    font-size: 13px;
+    height: 10px;
   }
   .disclosure {
-    border: none;
-    background: transparent;
-    text-align: left;
-    padding: 2px 0;
-    font-weight: 560;
-    color: var(--dim);
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .disclosure :global(svg) {
+    transition: transform 0.15s;
+  }
+  .disclosure[aria-expanded='true'] :global(svg) {
+    transform: rotate(90deg);
   }
 </style>

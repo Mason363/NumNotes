@@ -88,39 +88,42 @@
     flex: 1;
     min-height: 0;
     overflow: auto;
-    background: var(--bg);
-    background-image: radial-gradient(var(--line) 1px, transparent 1px);
+    background: var(--layout);
+    background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
     background-size: 16px 16px;
   }
   .pad {
-    padding: 20px;
+    padding: 24px;
     width: max-content;
     min-width: 100%;
     display: flex;
     justify-content: center;
   }
   .pad :global(.stage) {
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 2px 12px rgba(38, 44, 80, 0.12);
   }
   .zoom {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     padding: 6px 12px;
     border-top: 1px solid var(--line);
-    background: var(--panel);
+    flex: none;
   }
   .pct {
     border: none;
     background: transparent;
     font-variant-numeric: tabular-nums;
-    font-size: 12.5px;
-    min-width: 48px;
-    padding: 4px;
-    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
+    min-width: 52px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: var(--pill);
   }
   .pct:hover {
-    background: var(--hover);
+    background: var(--layout);
   }
   .zoom .muted {
     margin-left: 10px;

@@ -24,7 +24,15 @@ static void list_move(list_t *l, int ev, int count, int row_h, int visible_h) {
   app_invalidate();
 }
 
-static void draw_list_bg(gfx_t *g, nn_rect_t r) { gfx_fill(g, r, g_theme.panel); }
+static void draw_list_bg(gfx_t *g, nn_rect_t r) { gfx_fill(g, r, g_theme.wall); }
+
+/* Rows start UI_LIST_TOP below the area and keep that gap at the bottom. */
+static int list_visible(nn_rect_t area) { return area.h - 2 * UI_LIST_TOP; }
+
+static nn_rect_t list_row(nn_rect_t area, int row, int row_h, int scroll) {
+  nn_rect_t r = {0, area.y + UI_LIST_TOP + row * row_h - scroll, NN_SCREEN_W, row_h};
+  return r;
+}
 
 static void draw_empty(gfx_t *g, nn_rect_t r, const char *title, const char *hint) {
   int y = r.y + r.h / 2 - 20;
@@ -119,7 +127,7 @@ void home_draw(gfx_t *g, screen_t *s) {
   }
   nn_rect_t saved = gfx_push_clip(g, area);
   for (int row = 0; row < count; row++) {
-    nn_rect_t r = {0, area.y + row * ROW_H - l->scroll, NN_SCREEN_W, ROW_H};
+    nn_rect_t r = list_row(area, row, ROW_H, l->scroll);
     if (r.y + r.h < g->clip.y || r.y > g->clip.y + g->clip.h) continue;
     char subtitle[48];
     ui_row_t data = {0};
@@ -138,15 +146,12 @@ void home_draw(gfx_t *g, screen_t *s) {
     }
     data.subtitle = subtitle;
     ui_row(g, r, &data, row == l->sel);
-    if (row + 1 < count && row != l->sel && row + 1 != l->sel) {
-      gfx_hline(g, 50, r.y + r.h - 1, NN_SCREEN_W - 58, g_theme.line);
-    }
   }
-  ui_scrollbar(g, area, l->scroll, count * ROW_H, area.h);
+  ui_scrollbar(g, area, l->scroll, count * ROW_H, list_visible(area));
   gfx_set_clip(g, saved);
   if (hints) {
     nn_rect_t bar = {0, NN_SCREEN_H - HINT_H, NN_SCREEN_W, HINT_H};
-    gfx_fill(g, bar, g_theme.panel);
+    gfx_fill(g, bar, g_theme.cell);
     gfx_hline(g, 0, bar.y, NN_SCREEN_W, g_theme.line);
     static const char *const k_hints[] = {"OK", "Open", "\xE2\x8A\x9E", "Menu",
                                           "a", "Search"};
@@ -163,7 +168,7 @@ bool home_event(screen_t *s, int ev) {
   switch (ev) {
     case EV_UP:
     case EV_DOWN:
-      list_move(l, ev, count, ROW_H, area.h);
+      list_move(l, ev, count, ROW_H, list_visible(area));
       return true;
     case EV_OK:
     case EV_EXE:
@@ -208,7 +213,7 @@ void notes_draw(gfx_t *g, screen_t *s) {
   int count = g_store.note_count + 1;
   nn_rect_t saved = gfx_push_clip(g, area);
   for (int row = 0; row < count; row++) {
-    nn_rect_t r = {0, area.y + row * ROW_H - l->scroll, NN_SCREEN_W, ROW_H};
+    nn_rect_t r = list_row(area, row, ROW_H, l->scroll);
     if (r.y + r.h < g->clip.y || r.y > g->clip.y + g->clip.h) continue;
     ui_row_t data = {0};
     char title[48], subtitle[48];
@@ -225,9 +230,8 @@ void notes_draw(gfx_t *g, screen_t *s) {
       data.indent = 4;
     }
     ui_row(g, r, &data, row == l->sel);
-    gfx_hline(g, 8, r.y + r.h - 1, NN_SCREEN_W - 16, g_theme.line);
   }
-  ui_scrollbar(g, area, l->scroll, count * ROW_H, area.h);
+  ui_scrollbar(g, area, l->scroll, count * ROW_H, list_visible(area));
   gfx_set_clip(g, saved);
   const char *title = "Notes";
   for (int i = 0; i < bundle_section_count(); i++) {
@@ -248,7 +252,7 @@ bool notes_event(screen_t *s, int ev) {
   switch (ev) {
     case EV_UP:
     case EV_DOWN:
-      list_move(l, ev, count, ROW_H, content_rect(false).h);
+      list_move(l, ev, count, ROW_H, list_visible(content_rect(false)));
       return true;
     case EV_OK:
     case EV_EXE:
@@ -558,8 +562,8 @@ void search_draw(gfx_t *g, screen_t *s) {
   nn_rect_t area = content_rect(false);
   draw_list_bg(g, area);
   /* Query field. */
-  nn_rect_t field = {8, NN_STATUS_H + 6, NN_SCREEN_W - 16, 26};
-  gfx_fill(g, field, g_theme.bg);
+  nn_rect_t field = {UI_CELL_INSET, NN_STATUS_H + UI_LIST_TOP, NN_SCREEN_W - 2 * UI_CELL_INSET, 26};
+  gfx_fill(g, field, g_theme.cell);
   gfx_border(g, field, 0, 1, g_theme.accent);
   int ty = field.y + (field.h - font_line_height(g_theme.font)) / 2;
   int end = text_draw(g, g_theme.font, st->query, -1, field.x + 10, ty, g_theme.fg);
@@ -567,8 +571,8 @@ void search_draw(gfx_t *g, screen_t *s) {
     nn_rect_t caret = {end + 1, ty, 2, font_line_height(g_theme.font)};
     gfx_fill(g, caret, g_theme.accent);
   }
-  nn_rect_t list = {0, field.y + field.h + 6, NN_SCREEN_W,
-                    NN_SCREEN_H - (field.y + field.h + 6)};
+  nn_rect_t list = {0, field.y + field.h + UI_LIST_TOP, NN_SCREEN_W,
+                    NN_SCREEN_H - (field.y + field.h + UI_LIST_TOP)};
   if (st->len == 0) {
     draw_empty(g, list, "Search everything", "Press alpha, then type letters");
   } else if (st->result_count == 0) {
@@ -579,19 +583,18 @@ void search_draw(gfx_t *g, screen_t *s) {
   for (int i = 0; i < st->result_count; i++) {
     nn_rect_t r = {0, list.y + i * row_h - st->scroll, NN_SCREEN_W, row_h};
     if (r.y + r.h < g->clip.y || r.y > g->clip.y + g->clip.h) continue;
-    if (i == st->sel) {
-      gfx_fill(g, r, g_theme.selection);
-      nn_rect_t bar = {0, r.y, 3, r.h};
-      gfx_fill(g, bar, g_theme.accent);
-    }
+    nn_rect_t cell = {UI_CELL_INSET, r.y, NN_SCREEN_W - 2 * UI_CELL_INSET, r.h};
+    nn_rect_t outline = {cell.x, cell.y, cell.w, cell.h + 1};
+    gfx_fill(g, cell, i == st->sel ? g_theme.selection : g_theme.cell);
+    gfx_border(g, outline, 0, 1, g_theme.line);
+    int tx = cell.x + 8, tw = cell.w - 16;
     char origin[48];
     result_origin(&s_results[i], origin);
-    text_draw_fit(g, g_theme.font, origin, 12, r.y + 3, NN_SCREEN_W - 24, g_theme.dim);
+    text_draw_fit(g, g_theme.font, origin, tx, r.y + 3, tw, g_theme.dim);
     const char *text = result_text(&s_results[i]);
     int at = s_results[i].offset;
-    draw_snippet(g, text, at, match_bytes(text, at, st->query), 12,
-                 r.y + 4 + font_line_height(g_theme.font), NN_SCREEN_W - 24);
-    gfx_hline(g, 8, r.y + r.h - 1, NN_SCREEN_W - 16, g_theme.line);
+    draw_snippet(g, text, at, match_bytes(text, at, st->query), tx,
+                 r.y + 4 + font_line_height(g_theme.font), tw);
   }
   ui_scrollbar(g, list, st->scroll, st->result_count * row_h, list.h);
   gfx_set_clip(g, saved);
@@ -628,7 +631,7 @@ static void open_result(const result_t *r) {
 
 bool search_event(screen_t *s, int ev) {
   search_t *st = &s->u.search;
-  int row_h = 40, list_h = NN_SCREEN_H - (NN_STATUS_H + 38);
+  int row_h = 40, list_h = NN_SCREEN_H - (NN_STATUS_H + 2 * UI_LIST_TOP + 26);
   switch (ev) {
     case EV_UP:
     case EV_DOWN: {
@@ -721,7 +724,7 @@ void bookmarks_draw(gfx_t *g, screen_t *s) {
   }
   nn_rect_t saved = gfx_push_clip(g, area);
   for (int row = 0; row < count; row++) {
-    nn_rect_t r = {0, area.y + row * ROW_H - l->scroll, NN_SCREEN_W, ROW_H};
+    nn_rect_t r = list_row(area, row, ROW_H, l->scroll);
     if (r.y + r.h < g->clip.y || r.y > g->clip.y + g->clip.h) continue;
     ui_row_t data = {0};
     char subtitle[32];
@@ -741,6 +744,7 @@ void bookmarks_draw(gfx_t *g, screen_t *s) {
     }
     ui_row(g, r, &data, row == l->sel);
   }
+  ui_scrollbar(g, area, l->scroll, count * ROW_H, list_visible(area));
   gfx_set_clip(g, saved);
   ui_status_bar(g, "Bookmarks", NULL);
 }
@@ -752,7 +756,7 @@ bool bookmarks_event(screen_t *s, int ev) {
   switch (ev) {
     case EV_UP:
     case EV_DOWN:
-      list_move(l, ev, count, ROW_H, content_rect(false).h);
+      list_move(l, ev, count, ROW_H, list_visible(content_rect(false)));
       return true;
     case EV_OK:
     case EV_EXE:
@@ -820,7 +824,7 @@ void toc_draw(gfx_t *g, screen_t *s) {
   nn_rect_t saved = gfx_push_clip(g, area);
   int row_h = 34;
   for (int row = 0; row < count; row++) {
-    nn_rect_t r = {0, area.y + row * row_h - l->scroll, NN_SCREEN_W, row_h};
+    nn_rect_t r = list_row(area, row, row_h, l->scroll);
     if (r.y + r.h < g->clip.y || r.y > g->clip.y + g->clip.h) continue;
     ui_row_t data = {0};
     data.icon = -1;
@@ -839,7 +843,7 @@ void toc_draw(gfx_t *g, screen_t *s) {
     }
     ui_row(g, r, &data, row == l->sel);
   }
-  ui_scrollbar(g, area, l->scroll, count * row_h, area.h);
+  ui_scrollbar(g, area, l->scroll, count * row_h, list_visible(area));
   gfx_set_clip(g, saved);
   ui_status_bar(g, "Contents", view_title(v));
 }
@@ -852,7 +856,7 @@ bool toc_event(screen_t *s, int ev) {
   switch (ev) {
     case EV_UP:
     case EV_DOWN:
-      list_move(l, ev, count, 34, content_rect(false).h);
+      list_move(l, ev, count, 34, list_visible(content_rect(false)));
       return true;
     case EV_OK:
     case EV_EXE: {

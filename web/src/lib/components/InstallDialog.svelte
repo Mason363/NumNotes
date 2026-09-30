@@ -243,12 +243,34 @@
     display: grid;
     gap: 14px;
   }
+  /* Numbered steps in yellow circles. */
   .steps {
+    list-style: none;
+    counter-reset: step;
     margin: 0;
-    padding-left: 22px;
+    padding: 0;
     display: grid;
-    gap: 8px;
+    gap: 12px;
     font-size: 15px;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .steps li::before {
+    content: counter(step);
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
   }
   .center {
     display: grid;
@@ -257,12 +279,16 @@
     gap: 10px;
     padding: 24px 8px;
   }
+  .center h3 {
+    font-size: 28px;
+    font-weight: 300;
+  }
   .spinner {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 3px solid var(--line);
-    border-top-color: var(--accent);
+    border: 3px solid var(--card);
+    border-top-color: var(--purple);
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin {
@@ -275,93 +301,94 @@
     align-items: center;
     gap: 12px;
     padding: 12px 14px;
-    border-radius: 2px;
-    background: var(--hover);
+    border-radius: var(--radius);
+    background: var(--card);
   }
   .calc-card div {
     display: grid;
   }
+  .calc-card strong {
+    font-size: 15px;
+  }
   h4 {
-    font-size: 12.5px;
-    color: var(--dim);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
     margin-bottom: 6px;
   }
   .apps {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 4px;
     display: grid;
-    gap: 4px;
+    border-radius: var(--radius);
+    background: var(--layout);
   }
   .apps li {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 5px 8px;
-    border-radius: 2px;
-    border: 1px solid var(--line);
+    padding: 6px 8px;
+  }
+  .apps li + li {
+    box-shadow: 0 -1px 0 var(--line);
   }
   .apps li.removed {
-    opacity: 0.6;
+    opacity: 0.55;
+  }
+  .apps li.removed .name {
     text-decoration: line-through;
   }
   .apps img,
   .ph {
-    width: 26px;
-    height: 26px;
-    border-radius: 2px;
-    background: var(--hover);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--card);
   }
   .name {
     flex: 1;
-    font-weight: 560;
+    font-weight: 700;
+    font-size: 13px;
   }
   .badge {
-    font-size: 11.5px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 2px;
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: var(--pill);
+    background: var(--accent);
+    color: #fff;
   }
   .badge.warn {
-    background: color-mix(in srgb, var(--danger) 12%, transparent);
-    color: var(--danger);
+    background: var(--danger);
   }
+  /* NumWorks' alert box. */
   .warning {
     display: flex;
     gap: 10px;
-    padding: 12px;
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--danger) 9%, transparent);
-    color: var(--text);
-  }
-  .warning :global(svg) {
-    color: var(--danger);
-    flex: none;
-    margin-top: 2px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: #f2dede;
+    color: #a94442;
   }
   .agree {
     display: flex;
     gap: 8px;
     align-items: center;
     margin-top: 8px;
-    font-weight: 560;
+    font-weight: 700;
   }
   .bar {
     height: 8px;
-    border-radius: 2px;
-    background: var(--line);
+    border-radius: 4px;
+    background: var(--card);
     overflow: hidden;
   }
   .bar span {
     display: block;
     height: 100%;
+    border-radius: 4px;
     background: var(--accent);
     transition: width 0.2s;
-  }
-  ol li {
-    line-height: 1.5;
   }
 </style>

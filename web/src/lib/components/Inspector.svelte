@@ -34,39 +34,39 @@
 </div>
 
 <style>
-.inspector {
+  /* A settings widget, like the Board's Settings panel, with the tab
+   * underline from NumWorks' workshop. */
+  .inspector {
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    min-height: 100%;
+    background: var(--card);
+    border-radius: var(--radius);
   }
   .tabs {
     display: flex;
-    border-bottom: 1px solid var(--line-strong);
-    position: sticky;
-    top: 0;
-    background: var(--panel-2);
-    z-index: 3;
+    gap: 4px;
+    padding: 6px 12px 0;
   }
   .tabs button {
     flex: 1;
     border: none;
-    border-right: 1px solid var(--line);
+    border-bottom: 3px solid var(--card-hover);
     background: transparent;
-    height: 32px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--dim);
+    padding: 8px 4px 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--label);
   }
-  .tabs button:last-child {
-    border-right: none;
+  .tabs button:hover {
+    color: var(--text);
   }
   .tabs button.on {
-    background: var(--accent);
-    color: var(--on-accent);
+    border-bottom-color: var(--accent);
+    font-weight: 800;
+    color: var(--text);
   }
   .content {
-    padding: 14px 14px 40px;
+    padding: 16px 12px 24px;
   }
 </style>

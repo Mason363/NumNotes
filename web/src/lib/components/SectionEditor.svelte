@@ -23,7 +23,7 @@
   {@const Icon = SECTION_ICONS[section.icon]}
   <div class="section-editor">
     <header>
-      <span class="icon" style="background: {section.iconColor}"><Icon size={16} color="#fff" /></span>
+      <span class="icon" style="background: {section.iconColor}"><Icon size={16} color="#fff" strokeWidth={2.25} /></span>
       <input
         class="title"
         value={section.title}
@@ -61,12 +61,12 @@
   <div class="empty">
     <h2>Nothing here yet</h2>
     <p class="muted">Add a section, or drop files anywhere on the page.</p>
-    <Button variant="primary" onclick={addFirst}><Plus /> Add a document</Button>
+    <Button variant="primary" onclick={addFirst}><Plus strokeWidth={2.5} />Add a document</Button>
   </div>
 {/if}
 
 <style>
-.section-editor {
+  .section-editor {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -75,16 +75,16 @@
   header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-    height: 40px;
+    gap: 10px;
+    padding: 0 16px 0 12px;
+    height: 52px;
     border-bottom: 1px solid var(--line);
-    background: var(--panel);
+    flex: none;
   }
   .icon {
-    width: 22px;
-    height: 22px;
-    border-radius: 2px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
     display: grid;
     place-items: center;
     flex: none;
@@ -94,24 +94,27 @@
     min-width: 0;
     border: 1px solid transparent;
     background: transparent;
-    font-size: 14px;
-    font-weight: 650;
-    padding: 3px 6px;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 8px;
     border-radius: var(--radius-sm);
+    color: var(--text);
   }
   .title:hover {
-    border-color: var(--line);
+    background: var(--layout);
   }
   .title:focus {
-    border-color: var(--text);
+    background: var(--panel);
+    border-color: var(--purple);
     outline: none;
   }
   .mode {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--dim);
+    color: var(--purple);
+    background: var(--purple-soft);
+    padding: 3px 10px;
+    border-radius: var(--pill);
   }
   .body {
     flex: 1;
@@ -122,9 +125,13 @@
   .empty {
     margin: auto;
     display: grid;
-    gap: 10px;
+    gap: 12px;
     justify-items: center;
     text-align: center;
     padding: 40px;
+  }
+  .empty h2 {
+    font-size: 28px;
+    font-weight: 300;
   }
 </style>

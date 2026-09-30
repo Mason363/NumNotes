@@ -57,7 +57,7 @@
       <ColorInput value={section.iconColor} swatches={SECTION_COLORS} onchange={(c) => c && set((s) => (s.iconColor = c))} />
     </Field>
     <Field label="Home screen subtitle" hint="Empty: “12 slides” etc.">
-      <input class="text" value={section.subtitle ?? ''} maxlength="40" oninput={(e) => set((s) => (s.subtitle = (e.currentTarget as HTMLInputElement).value || undefined), 'subtitle')} />
+      <input class="field-input" value={section.subtitle ?? ''} maxlength="40" oninput={(e) => set((s) => (s.subtitle = (e.currentTarget as HTMLInputElement).value || undefined), 'subtitle')} />
     </Field>
     {#if section.mode !== 'notes'}
       <Field label="Background">
@@ -72,7 +72,7 @@
     </Field>
 
     {#if section.mode === 'slides'}
-      <h3>Slideshow</h3>
+      <h3 class="group-title">Slideshow</h3>
       <Field label="Autoplay (EXE toggles)" inline>
         <Toggle checked={section.autoplay} onchange={(v) => set((s) => s.mode === 'slides' && (s.autoplay = v))} />
       </Field>
@@ -83,18 +83,18 @@
       <Field label="Slide transition" inline><Toggle checked={section.transition} onchange={(v) => set((s) => s.mode === 'slides' && (s.transition = v))} /></Field>
       <Field label="Show page number" inline><Toggle checked={section.pageNumbers} onchange={(v) => set((s) => s.mode === 'slides' && (s.pageNumbers = v))} /></Field>
       {#if slide}
-        <h3>This slide</h3>
+        <h3 class="group-title">This slide</h3>
         <Field label="Title (contents)">
-          <input class="text" value={slide.title ?? ''} oninput={(e) => setSlide((sl) => (sl.title = (e.currentTarget as HTMLInputElement).value || undefined), 'slide-title')} />
+          <input class="field-input" value={slide.title ?? ''} oninput={(e) => setSlide((sl) => (sl.title = (e.currentTarget as HTMLInputElement).value || undefined), 'slide-title')} />
         </Field>
         <Field label="Slide background">
           <ColorInput value={slide.background} allowNone onchange={(c) => setSlide((sl) => (sl.background = c))} />
         </Field>
       {/if}
     {:else if section.mode === 'document'}
-      <h3>Text</h3>
+      <h3 class="group-title">Text</h3>
       <Field label="Font">
-        <select class="text" value={section.font} onchange={(e) => set((s) => s.mode === 'document' && (s.font = (e.currentTarget as HTMLSelectElement).value as typeof s.font))}>
+        <select class="field-input" value={section.font} onchange={(e) => set((s) => s.mode === 'document' && (s.font = (e.currentTarget as HTMLSelectElement).value as typeof s.font))}>
           {#each Object.entries(FAMILY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}
         </select>
       </Field>
@@ -102,7 +102,7 @@
       <Field label="Line spacing"><Slider value={section.lineHeight} min={1.1} max={1.9} step={0.05} oninput={(v) => set((s) => s.mode === 'document' && (s.lineHeight = v), 'lineHeight')} /></Field>
       <Field label="Margins"><Slider value={section.margin} min={2} max={30} unit="px" oninput={(v) => set((s) => s.mode === 'document' && (s.margin = v), 'margin')} /></Field>
     {:else if section.mode === 'canvas'}
-      <h3>Board</h3>
+      <h3 class="group-title">Board</h3>
       <Field label="Size">
         <Segmented
           value={BOARD_SIZES.find((b) => b.w === section.width && b.h === section.height)?.label ?? 'Custom'}
@@ -119,8 +119,8 @@
         />
       </Field>
       <div class="grid2">
-        <label>Width <input type="number" min="320" max="8000" value={section.width} onchange={(e) => set((s) => s.mode === 'canvas' && (s.width = Math.max(320, Number((e.currentTarget as HTMLInputElement).value) || 320)))} /></label>
-        <label>Height <input type="number" min="240" max="8000" value={section.height} onchange={(e) => set((s) => s.mode === 'canvas' && (s.height = Math.max(240, Number((e.currentTarget as HTMLInputElement).value) || 240)))} /></label>
+        <label>Width <input class="field-input" type="number" min="320" max="8000" value={section.width} onchange={(e) => set((s) => s.mode === 'canvas' && (s.width = Math.max(320, Number((e.currentTarget as HTMLInputElement).value) || 320)))} /></label>
+        <label>Height <input class="field-input" type="number" min="240" max="8000" value={section.height} onchange={(e) => set((s) => s.mode === 'canvas' && (s.height = Math.max(240, Number((e.currentTarget as HTMLInputElement).value) || 240)))} /></label>
       </div>
       <Field label="Start">
         <Segmented
@@ -137,7 +137,7 @@
       <Field label="Minimap" inline><Toggle checked={section.minimap} onchange={(v) => set((s) => s.mode === 'canvas' && (s.minimap = v))} /></Field>
       <p class="muted small">OK jumps between stops. Mark items as stops, or every item is one.</p>
     {:else if section.mode === 'gallery'}
-      <h3>Grid</h3>
+      <h3 class="group-title">Grid</h3>
       <Field label="Columns">
         <Segmented
           value={section.columns}
@@ -159,46 +159,33 @@
 <style>
   .panel {
     display: grid;
-    gap: 14px;
+    gap: 16px;
   }
   h3 {
-    font-size: 13px;
-    color: var(--dim);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .icons {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 5px;
+    gap: 6px;
     width: 100%;
   }
   .ic {
-    height: 32px;
-    border-radius: 2px;
-    border: 1px solid var(--line);
-    background: var(--panel);
+    aspect-ratio: 1;
+    border-radius: 7px;
+    border: none;
+    background: var(--field);
     display: grid;
     place-items: center;
-    color: var(--dim);
+    color: var(--label);
+  }
+  .ic:hover {
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
   }
   .ic.on {
     background: var(--c);
-    border-color: var(--c);
     color: #fff;
-  }
-  .text {
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    padding: 6px 8px;
-    background: var(--panel);
-    font-size: 13px;
-  }
-  .text:focus {
-    border-color: var(--accent);
-    outline: none;
   }
   .grid2 {
     display: grid;
@@ -207,15 +194,8 @@
   }
   .grid2 label {
     display: grid;
-    gap: 3px;
+    gap: 4px;
     font-size: 12px;
-    color: var(--dim);
-    font-weight: 550;
-  }
-  .grid2 input {
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    padding: 5px 7px;
-    background: var(--panel);
+    color: var(--text);
   }
 </style>

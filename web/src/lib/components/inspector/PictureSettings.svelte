@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw } from '@lucide/svelte';
+  import { ChevronRight, FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw } from '@lucide/svelte';
   import type { ImageAdjust, ImageQuality } from '../../../model/types.ts';
   import { DEFAULT_ADJUST, DEFAULT_QUALITY } from '../../../pack/images.ts';
   import Field from '../../ui/Field.svelte';
@@ -78,8 +78,8 @@
     />
   </Field>
 
-  <button class="disclosure" onclick={() => (showAdjust = !showAdjust)} aria-expanded={showAdjust}>
-    {showAdjust ? '▾' : '▸'} Adjust colors & orientation
+  <button class="text-link disclosure" onclick={() => (showAdjust = !showAdjust)} aria-expanded={showAdjust}>
+    <ChevronRight size={14} strokeWidth={2.5} />Adjust colors and orientation
   </button>
   {#if showAdjust}
     <div class="adjust">
@@ -95,7 +95,7 @@
       <Field label="Sharpen"><Slider value={a.sharpen} min={0} max={100} oninput={(sharpen) => setA({ sharpen }, 'sharpen')} /></Field>
       <Field label="Black & white" inline><Toggle checked={a.grayscale} onchange={(grayscale) => setA({ grayscale })} /></Field>
       <Field label="Invert colors" inline><Toggle checked={a.invert} onchange={(invert) => setA({ invert })} /></Field>
-      <button class="reset" onclick={() => onchange({ adjust: { ...DEFAULT_ADJUST } }, 'reset')}>Reset adjustments</button>
+      <button class="text-link reset" onclick={() => onchange({ adjust: { ...DEFAULT_ADJUST } }, 'reset')}>Reset adjustments</button>
     </div>
   {/if}
 </div>
@@ -104,26 +104,28 @@
   .picture-settings,
   .adjust {
     display: grid;
-    gap: 14px;
+    gap: 16px;
   }
   .orient {
     display: flex;
     gap: 4px;
   }
+  .orient :global(.icon-btn) {
+    background: var(--field);
+  }
   .disclosure {
-    border: none;
-    background: transparent;
-    text-align: left;
-    padding: 2px 0;
-    font-weight: 560;
-    color: var(--dim);
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .disclosure :global(svg) {
+    transition: transform 0.15s;
+  }
+  .disclosure[aria-expanded='true'] :global(svg) {
+    transform: rotate(90deg);
   }
   .reset {
     justify-self: start;
-    border: 1px solid var(--line);
-    background: var(--panel);
-    border-radius: 2px;
-    padding: 4px 10px;
-    font-size: 12.5px;
   }
 </style>

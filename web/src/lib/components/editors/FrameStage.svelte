@@ -381,7 +381,7 @@
     pointer-events: none;
   }
   .item.sel {
-    outline: 1.5px solid var(--accent);
+    outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
   .item.link::after {

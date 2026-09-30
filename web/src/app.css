@@ -1,65 +1,88 @@
-/* Flat and plain, like the calculator it serves: NumWorks yellow, greys,
- * hairline borders, square corners. */
+/* NumWorks look: Manrope, lavender layout, soft blue cards, yellow for
+ * primary actions and selection, purple for links. */
 :root {
-  --bg: #f0f0f0;
+  --bg: #f5f6ff;
+  --layout: #f5f6ff;
   --panel: #ffffff;
-  --panel-2: #f7f7f7;
-  --hover: #ececec;
-  --line: #dcdcdc;
-  --line-strong: #c4c4c4;
-  --text: #1f1f1f;
-  --dim: #666666;
-  --faint: #999999;
+  --panel-2: #f5f6ff;
+  --card: #dde5ff;
+  --card-hover: #d3dcff;
+  --field: #ffffff;
+  --hover: #eef1ff;
+  --line: #e3e7f6;
+  --line-strong: #c9d1ea;
+  --text: #262626;
+  --label: #4a5565;
+  --dim: #6a7282;
+  --faint: #9aa1b0;
   --accent: #ffb734;
-  --accent-strong: #f5a41c;
-  --accent-soft: #fff3d6;
-  --accent-text: #8a5a00;
-  --on-accent: #1f1f1f;
-  --danger: #d8352a;
-  --ok: #2e8b3d;
-  --focus: 0 0 0 2px #1f1f1f;
-  --shadow-sm: none;
-  --shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
-  --radius: 3px;
-  --radius-sm: 2px;
-  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --accent-strong: #f5a61c;
+  --accent-soft: #fff3dc;
+  --accent-text: #b67800;
+  --on-accent: #ffffff;
+  --purple: #7a81ff;
+  --purple-strong: #6168f2;
+  --purple-soft: #eceeff;
+  --grey-btn: #656975;
+  --danger: #e5484d;
+  --ok: #2fa84f;
+  --focus: 0 0 0 2px var(--purple);
+  --shadow: 0 1px 2px rgba(38, 44, 80, 0.08);
+  --shadow-lg: 0 12px 32px rgba(38, 44, 80, 0.18);
+  --radius-lg: 12px;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --pill: 20px;
+  --font: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #161616;
-    --panel: #1e1e1e;
-    --panel-2: #191919;
-    --hover: #2a2a2a;
-    --line: #333333;
-    --line-strong: #474747;
-    --text: #e8e8e8;
-    --dim: #a3a3a3;
-    --faint: #707070;
-    --accent-soft: #3a2d10;
-    --accent-text: #ffc85c;
-    --focus: 0 0 0 2px #ffb734;
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --bg: #15161d;
+    --layout: #15161d;
+    --panel: #1f2029;
+    --panel-2: #15161d;
+    --card: #2a2d40;
+    --card-hover: #33374d;
+    --field: #1f2029;
+    --hover: #282a38;
+    --line: #2e3142;
+    --line-strong: #3d4157;
+    --text: #eceef4;
+    --label: #b9bfcc;
+    --dim: #9199aa;
+    --faint: #6b7283;
+    --accent-soft: #3a2d12;
+    --accent-text: #ffc55c;
+    --purple-soft: #2b2d4f;
+    --grey-btn: #aeb3c0;
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --bg: #161616;
-  --panel: #1e1e1e;
-  --panel-2: #191919;
-  --hover: #2a2a2a;
-  --line: #333333;
-  --line-strong: #474747;
-  --text: #e8e8e8;
-  --dim: #a3a3a3;
-  --faint: #707070;
-  --accent-soft: #3a2d10;
-  --accent-text: #ffc85c;
-  --focus: 0 0 0 2px #ffb734;
+  --bg: #15161d;
+  --layout: #15161d;
+  --panel: #1f2029;
+  --panel-2: #15161d;
+  --card: #2a2d40;
+  --card-hover: #33374d;
+  --field: #1f2029;
+  --hover: #282a38;
+  --line: #2e3142;
+  --line-strong: #3d4157;
+  --text: #eceef4;
+  --label: #b9bfcc;
+  --dim: #9199aa;
+  --faint: #6b7283;
+  --accent-soft: #3a2d12;
+  --accent-text: #ffc55c;
+  --purple-soft: #2b2d4f;
+  --grey-btn: #aeb3c0;
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
@@ -73,7 +96,7 @@ body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font: 13px/1.45 var(--font);
+  font: 14px/1.45 var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -103,7 +126,7 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 p {
@@ -111,7 +134,13 @@ p {
 }
 
 a {
-  color: var(--accent-text);
+  color: var(--purple);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 .muted {
@@ -122,13 +151,70 @@ a {
   font-size: 12px;
 }
 
-/* Section labels: small caps like the calculator's title bars. */
-.label-caps {
-  font-size: 11px;
+/* Panel headings, like the Board's "Deck" and "Settings". */
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Group headings inside a panel. */
+.group-title {
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--dim);
+  color: var(--label);
+}
+
+/* Small bold labels. */
+.label-caps {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--label);
+}
+
+/* Text fields and selects: white, soft corners, no border. */
+.field-input {
+  width: 100%;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  background: var(--field);
+  color: var(--label);
+  font-size: 12px;
+}
+
+.field-input:hover {
+  border-color: var(--line-strong);
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+select.field-input {
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%234a5565'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+/* A plain purple text action, like the Board's "Templates". */
+.text-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text-link:hover {
+  color: var(--purple-strong);
+  text-decoration: underline;
 }
 
 .sr-only {

@@ -203,24 +203,26 @@
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: rgba(255, 183, 52, 0.12);
+    background: rgba(122, 129, 255, 0.14);
     display: grid;
     place-items: center;
     pointer-events: none;
     padding: 24px;
   }
   .target {
-    border: 1px dashed var(--accent);
-    border-radius: 2px;
+    border: 2px dashed var(--purple);
+    border-radius: var(--radius-lg);
     background: var(--panel);
     box-shadow: var(--shadow-lg);
-    padding: 36px 44px;
+    padding: 40px 56px;
     display: grid;
     gap: 6px;
     text-align: center;
   }
   .target strong {
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--purple);
   }
   .choices {
     display: grid;
@@ -233,29 +235,33 @@
     gap: 12px;
     text-align: left;
     padding: 10px 12px;
-    border-radius: 2px;
-    border: 1px solid var(--line);
-    background: var(--panel);
+    border-radius: var(--radius);
+    border: 2px solid transparent;
+    background: var(--layout);
   }
   .choice:hover {
-    background: var(--hover);
+    background: var(--card);
   }
   .choice.on {
     border-color: var(--accent);
-    background: var(--accent-soft);
+    background: var(--panel);
   }
   .dot {
-    width: 12px;
-    height: 12px;
-    border: 1px solid var(--line-strong);
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--line-strong);
     border-radius: 50%;
     flex: none;
+    background: var(--panel);
   }
   .choice.on .dot {
-    border: 4px solid var(--text);
+    border: 5px solid var(--accent);
   }
   .txt {
     display: grid;
+  }
+  .txt strong {
+    font-size: 13px;
   }
   .progress {
     display: grid;
@@ -263,23 +269,24 @@
     padding: 10px 0;
   }
   .bar {
-    height: 6px;
-    border-radius: 2px;
-    background: var(--line);
+    height: 8px;
+    border-radius: 4px;
+    background: var(--card);
     overflow: hidden;
   }
   .bar span {
     display: block;
     height: 100%;
+    border-radius: 4px;
     background: var(--accent);
     transition: width 0.2s;
   }
   .errors {
     margin: 12px 0 0;
-    padding: 10px 12px 10px 28px;
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--danger) 9%, transparent);
-    color: var(--danger);
+    padding: 10px 14px 10px 30px;
+    border-radius: var(--radius-sm);
+    background: #f2dede;
+    color: #a94442;
     font-size: 13px;
   }
 </style>

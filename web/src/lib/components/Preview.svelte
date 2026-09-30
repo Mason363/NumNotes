@@ -5,6 +5,8 @@
   import { build } from '../state/build.svelte.ts';
   import { db } from '../state/db.ts';
   import { store } from '../state/project.svelte.ts';
+  import { RotateCcw } from '@lucide/svelte';
+  import Button from '../ui/Button.svelte';
   import Keypad from './Keypad.svelte';
 
   let canvas: HTMLCanvasElement | undefined = $state();
@@ -124,8 +126,10 @@
       <Keypad {send} />
     </div>
   {/if}
-  <p class="caption muted small">Click the screen to type with your keyboard.</p>
-  <button class="tool" onclick={restart}>Restart app</button>
+  <div class="under">
+    <span class="small muted">Click the screen to type with your keyboard.</span>
+    <Button size="sm" onclick={restart}><RotateCcw strokeWidth={2.25} />Restart</Button>
+  </div>
 </div>
 
 {#snippet screen()}
@@ -148,17 +152,22 @@
   .preview {
     display: grid;
     justify-items: center;
-    gap: 6px;
+    align-content: start;
+    gap: 8px;
+    height: 100%;
   }
+  /* The product photo has its own studio backdrop; show it as a card. */
   .photo {
     position: relative;
-    height: calc(100vh - 124px);
+    height: calc(100vh - 110px);
     min-height: 420px;
     user-select: none;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
   }
   @media (max-width: 900px) {
     .photo {
-      height: calc(100vh - 180px);
+      height: calc(100vh - 190px);
     }
   }
   .photo img {
@@ -171,8 +180,9 @@
     background: #000;
   }
   .screen.focused {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline: 3px solid var(--purple);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
   canvas {
     width: 100%;
@@ -186,10 +196,11 @@
     inset: 0;
     display: grid;
     place-items: center;
-    background: rgba(0, 0, 0, 0.75);
-    color: #eee;
+    background: rgba(24, 26, 40, 0.8);
+    color: #fff;
     border: none;
     font-size: 12px;
+    font-weight: 700;
     text-align: center;
     padding: 12px;
   }
@@ -202,10 +213,10 @@
     cursor: pointer;
   }
   .key:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(122, 129, 255, 0.12);
   }
   .key.down {
-    background: rgba(0, 0, 0, 0.14);
+    background: rgba(122, 129, 255, 0.3);
   }
   .key.mod {
     background: rgba(255, 183, 52, 0.45);
@@ -213,8 +224,8 @@
   .fallback {
     width: 350px;
     padding: 14px;
-    background: #ececec;
-    border: 1px solid #c9c9c9;
+    background: var(--layout);
+    border-radius: var(--radius-lg);
     display: grid;
     gap: 14px;
   }
@@ -224,17 +235,11 @@
     height: 240px;
     background: #000;
   }
-  .caption {
-    text-align: center;
-  }
-  .tool {
-    border: 1px solid var(--line-strong);
-    background: var(--panel);
-    font-size: 11.5px;
-    padding: 2px 8px;
-    border-radius: var(--radius-sm);
-  }
-  .tool:hover {
-    background: var(--hover);
+  .under {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 </style>

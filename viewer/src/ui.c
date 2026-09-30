@@ -28,9 +28,13 @@ void ui_init(void) {
   g_theme.panel = s->panel;
   g_theme.line = s->line;
   g_theme.highlight = s->highlight;
-  g_theme.panel_fg = luma(s->panel) > 140 ? NN_RGB(0x20, 0x20, 0x24)
-                                          : NN_RGB(0xF2, 0xF2, 0xF4);
-  g_theme.selection = mix(s->panel, s->accent, 7);
+  bool light = luma(s->panel) > 140;
+  g_theme.panel_fg = light ? NN_RGB(0x20, 0x20, 0x24) : NN_RGB(0xF2, 0xF2, 0xF4);
+  g_theme.cell = s->panel;
+  g_theme.wall = light ? mix(s->panel, s->fg, 2) : s->bg;
+  /* The calculator's blue-grey selection (#D4D7E0 on white). */
+  g_theme.selection = light ? mix(s->panel, NN_RGB(0x53, 0x5F, 0x83), 8)
+                            : mix(s->panel, s->accent, 7);
   g_theme.selection_fg = g_theme.panel_fg;
   g_theme.shade = 0x0000;
   g_theme.font = s->ui_font;
@@ -71,12 +75,32 @@ void ui_battery(gfx_t *g, int x, int y, uint16_t color) {
   }
 }
 
-void ui_status_bar(gfx_t *g, const char *title, const char *right) {
+/* Copies `s` in capitals (ASCII and Latin-1) without splitting a character. */
+static void upper(const char *s, char *out, int size) {
+  int n = 0;
+  while (*s) {
+    int len = NN_MAX(utf8_len(s), 1);
+    if (n + len > size - 1) break;
+    for (int i = 0; i < len; i++) out[n + i] = s[i];
+    unsigned char c = (unsigned char)out[n];
+    if (len == 1 && c >= 'a' && c <= 'z') {
+      out[n] = (char)(c - 32);
+    } else if (len == 2 && c == 0xC3) {
+      unsigned char d = (unsigned char)out[n + 1];
+      if (d >= 0xA0 && d <= 0xBE && d != 0xB7) out[n + 1] = (char)(d - 32);
+    }
+    n += len;
+    s += len;
+  }
+  out[n] = 0;
+}
+
+void ui_status_bar(gfx_t *g, const char *title, const char *info) {
   nn_rect_t bar = {0, 0, NN_SCREEN_W, NN_STATUS_H};
   if (nn_rect_empty(nn_rect_intersect(bar, g->clip))) return;
   gfx_fill(g, bar, g_theme.accent);
   int ty = (NN_STATUS_H - font_line_height(g_theme.bold)) / 2;
-  int right_x = NN_SCREEN_W - 6;
+  int left_x = 6, right_x = NN_SCREEN_W - 6;
   if (bundle_settings()->flags & NN_SET_BATTERY) {
     right_x -= 20;
     ui_battery(g, right_x, 5, g_theme.accent_fg);
@@ -97,33 +121,36 @@ void ui_status_bar(gfx_t *g, const char *title, const char *right) {
               locked ? g_theme.accent : g_theme.accent_fg);
     right_x -= 6;
   }
-  if (right && *right) {
-    int w = text_width(g_theme.font, right, -1);
-    right_x -= w;
-    text_draw(g, g_theme.font, right, -1, right_x, ty, g_theme.accent_fg);
-    right_x -= 8;
+  if (info && *info) {
+    left_x = text_draw(g, g_theme.font, info, -1, left_x, ty, g_theme.accent_fg) + 8;
   }
-  text_draw_fit(g, g_theme.bold, title, 8, ty, right_x - 8, g_theme.accent_fg);
+  /* Centered on the screen, nudged aside by whatever is on the left or right. */
+  char caps[96];
+  upper(title, caps, sizeof caps);
+  int room = NN_MAX(right_x - left_x, 0);
+  int w = NN_MIN(text_width(g_theme.bold, caps, -1), room);
+  int x = NN_CLAMP((NN_SCREEN_W - w) / 2, left_x, right_x - w);
+  text_draw_fit(g, g_theme.bold, caps, x, ty, room, g_theme.accent_fg);
 }
 
 void ui_row(gfx_t *g, nn_rect_t r, const ui_row_t *row, bool selected) {
-  if (nn_rect_empty(nn_rect_intersect(r, g->clip))) return;
+  nn_rect_t cell = {r.x + UI_CELL_INSET, r.y, r.w - 2 * UI_CELL_INSET, r.h};
+  nn_rect_t outline = {cell.x, cell.y, cell.w, cell.h + 1};
+  if (nn_rect_empty(nn_rect_intersect(outline, g->clip))) return;
   uint16_t fg = g_theme.panel_fg;
-  if (selected) {
-    gfx_fill(g, r, g_theme.selection);
-    nn_rect_t bar = {r.x, r.y, 3, r.h};
-    gfx_fill(g, bar, g_theme.accent);
-  }
-  int x = r.x + ROW_PAD + row->indent;
+  gfx_fill(g, cell, selected ? g_theme.selection : g_theme.cell);
+  /* Neighbouring cells share their 1px border. */
+  gfx_border(g, outline, 0, 1, g_theme.line);
+  int x = cell.x + ROW_PAD + row->indent;
   if (row->icon >= 0) {
-    int size = NN_MIN(r.h - 10, 26);
+    int size = NN_MIN(r.h - 12, 26);
     nn_rect_t box = {x, r.y + (r.h - size) / 2, size, size};
-    gfx_round_rect(g, box, 3, row->icon_color, 255);
+    gfx_round_rect(g, box, 4, row->icon_color, 255);
     nn_rect_t glyph = {box.x + 4, box.y + 4, size - 8, size - 8};
     ui_icon(g, row->icon, glyph, 0xFFFF);
     x += size + ROW_PAD;
   }
-  int right_edge = r.x + r.w - ROW_PAD;
+  int right_edge = cell.x + cell.w - ROW_PAD;
   if (row->right) {
     int w = text_width(g_theme.font, row->right, -1);
     right_edge -= w;
@@ -156,7 +183,7 @@ void ui_scrollbar(gfx_t *g, nn_rect_t r, int offset, int content, int visible) {
   if (content <= visible || content <= 0) return;
   int h = NN_MAX(r.h * visible / content, 12);
   int y = r.y + (int)((int64_t)(r.h - h) * offset / NN_MAX(content - visible, 1));
-  nn_rect_t thumb = {r.x + r.w - 4, y, 3, h};
+  nn_rect_t thumb = {r.x + r.w - 5, y, 3, h};
   gfx_fill_alpha(g, thumb, g_theme.dim, 160);
 }
 

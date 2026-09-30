@@ -85,7 +85,7 @@
       />
       {#if icon.kind === 'glyph'}
         <Field label="Text (up to 4 characters)">
-          <input class="text" value={icon.glyph} maxlength="4" oninput={(e) => set({ ...glyph, glyph: (e.currentTarget as HTMLInputElement).value })} />
+          <input class="field-input glyph-input" value={icon.glyph} maxlength="4" oninput={(e) => set({ ...glyph, glyph: (e.currentTarget as HTMLInputElement).value })} />
         </Field>
         <div class="glyphs">
           {#each GLYPHS as g (g)}
@@ -106,7 +106,7 @@
           </div>
         </Field>
       {:else}
-        <Button onclick={pick}>Choose picture…</Button>
+        <div><Button onclick={pick}>Choose a picture</Button></div>
         <Field label="Zoom"><Slider value={imageZoom} min={1} max={4} step={0.05} unit="×" oninput={zoomImage} /></Field>
       {/if}
     </div>
@@ -131,15 +131,13 @@
   }
   .controls {
     display: grid;
-    gap: 14px;
+    gap: 16px;
   }
-  .text {
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    padding: 7px 10px;
+  .glyph-input {
+    height: 38px;
     font-size: 16px;
-    background: var(--panel);
+    font-weight: 700;
+    background: var(--layout);
   }
   .glyphs {
     display: grid;
@@ -147,15 +145,19 @@
     gap: 4px;
   }
   .g {
-    height: 34px;
-    border: 1px solid var(--line);
-    background: var(--panel);
-    border-radius: 2px;
+    height: 36px;
+    border: 2px solid transparent;
+    background: var(--layout);
+    border-radius: var(--radius-sm);
     font-size: 17px;
+    font-weight: 600;
+  }
+  .g:hover {
+    background: var(--card);
   }
   .g.on {
     border-color: var(--accent);
-    background: var(--accent-soft);
+    background: var(--panel);
   }
   .gradients {
     display: flex;
@@ -163,29 +165,31 @@
     gap: 6px;
   }
   .grad {
-    width: 28px;
-    height: 28px;
-    border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    font-weight: 700;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 800;
     font-size: 12px;
   }
   .grad.on {
     box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent);
   }
+  /* Mock of the calculator's home screen. */
   .home {
     background: #fff;
-    border-radius: 2px;
+    border-radius: var(--radius);
     overflow: hidden;
-    border: 6px solid #2a2a2e;
+    border: 8px solid #3a3a40;
     color: #333;
   }
-  /* Mock of the calculator's home screen. */
   .bar {
     background: #ffb734;
     color: #fff;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     text-align: center;
     padding: 3px;
   }
@@ -205,7 +209,7 @@
   .stub {
     width: 52px;
     height: 53px;
-    border-radius: 2px;
+    border-radius: 6px;
     background: #ececf0;
   }
   .mine span {

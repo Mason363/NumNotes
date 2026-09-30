@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { BringToFront, ChevronDown, Copy, Image, SendToBack, Shapes, Trash2, Type } from '@lucide/svelte';
   import { importFiles } from '../../../import/index.ts';
   import type { Item } from '../../../model/types.ts';
   import RichToolbar from '../../doc/RichToolbar.svelte';
-  import Button from '../../ui/Button.svelte';
   import Menu from '../../ui/Menu.svelte';
   import { assets } from '../../state/assets.ts';
   import { doc, imageItem, p, shapeItem, textItem } from '../../state/defaults.ts';
@@ -57,11 +57,11 @@
   {#if editor}
     <div class="format"><RichToolbar {editor} tick={store.editorTick} compact pictures={false} /></div>
   {:else}
-    <Button size="sm" onclick={addText}>+ Text</Button>
-    <Button size="sm" onclick={addPicture}>+ Picture</Button>
+    <button class="tool" onclick={addText}><Type />Text</button>
+    <button class="tool" onclick={addPicture}><Image />Picture</button>
     <Menu open={shapesOpen} onclose={() => (shapesOpen = false)}>
       {#snippet trigger()}
-        <Button size="sm" onclick={() => (shapesOpen = !shapesOpen)}>+ Shape ▾</Button>
+        <button class="tool" onclick={() => (shapesOpen = !shapesOpen)}><Shapes />Shape<ChevronDown class="caret" /></button>
       {/snippet}
       <button class="item" onclick={() => addShape('rect')}>Rectangle</button>
       <button class="item" onclick={() => addShape('ellipse')}>Ellipse</button>
@@ -70,10 +70,10 @@
     </Menu>
     <span class="spacer"></span>
     {#if selected.length}
-      <Button size="sm" variant="ghost" onclick={() => reorderItems(selected, 'front')}>Front</Button>
-      <Button size="sm" variant="ghost" onclick={() => reorderItems(selected, 'back')}>Back</Button>
-      <Button size="sm" variant="ghost" title="⌘D" onclick={() => duplicateItems(selected)}>Duplicate</Button>
-      <Button size="sm" variant="ghost" onclick={() => removeItems(selected)}>Delete</Button>
+      <button class="tool" onclick={() => reorderItems(selected, 'front')}><BringToFront />Front</button>
+      <button class="tool" onclick={() => reorderItems(selected, 'back')}><SendToBack />Back</button>
+      <button class="tool" title="⌘D" onclick={() => duplicateItems(selected)}><Copy />Duplicate</button>
+      <button class="tool" onclick={() => removeItems(selected)}><Trash2 />Delete</button>
     {:else}
       <span class="hint muted small">Double-click text to edit</span>
     {/if}
@@ -84,21 +84,55 @@
   .item-toolbar {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    background: var(--panel);
+    gap: 2px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--line);
     min-height: 46px;
     flex-wrap: wrap;
+    flex: none;
+  }
+  /* Tool buttons: purple line icon and a bold label, like the Board's rail. */
+  .tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border: none;
+    border-radius: var(--pill);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
+  }
+  .tool:hover {
+    background: var(--layout);
+    color: var(--text);
+  }
+  .tool :global(svg) {
+    width: 18px;
+    height: 18px;
+    color: var(--purple);
+    stroke-width: 1.75;
+  }
+  .tool :global(svg.caret) {
+    width: 14px;
+    height: 14px;
+    margin-left: -2px;
+    color: var(--label);
+    stroke-width: 2.5;
   }
   .format {
     flex: 1;
-    margin: -8px -12px;
+    margin: -6px -10px;
   }
   .format :global(.toolbar) {
     border-bottom: none;
   }
   .spacer {
     flex: 1;
+  }
+  .hint {
+    padding-right: 6px;
   }
 </style>

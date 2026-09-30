@@ -8,17 +8,25 @@
 typedef struct {
   uint16_t bg, fg, accent, accent_fg, dim, panel, line, highlight;
   uint16_t panel_fg, selection, selection_fg, shade;
+  uint16_t wall, cell; /* list background and list cells */
   int font, bold, title;
 } theme_t;
+
+/* Lists are tables of bordered cells inset from the screen edges, like the
+ * calculator's own Settings app. */
+#define UI_CELL_INSET 10
+#define UI_LIST_TOP 8
 
 extern theme_t g_theme;
 
 void ui_init(void);
 
-/* Status bar across the top of the screen. `right` may be NULL. */
-void ui_status_bar(gfx_t *g, const char *title, const char *right);
+/* Title bar across the top of the screen: the title centered in capitals,
+ * `info` (may be NULL) on the left, battery on the right. */
+void ui_status_bar(gfx_t *g, const char *title, const char *info);
 
-/* A list row; `selected` rows are highlighted. `icon` < 0 draws no icon. */
+/* A list cell spanning `r` minus the side insets; `selected` cells are
+ * highlighted. `icon` < 0 draws no icon. */
 typedef struct {
   const char *title;
   const char *subtitle; /* may be NULL */

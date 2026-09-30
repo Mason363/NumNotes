@@ -80,10 +80,11 @@
     display: grid;
     grid-template-rows: auto 1fr;
     min-height: 0;
+    background: var(--layout);
   }
   .body {
     display: grid;
-    grid-template-columns: 272px minmax(0, 1fr) auto;
+    grid-template-columns: 300px minmax(0, 1fr) auto;
     min-height: 0;
   }
   .col {
@@ -92,29 +93,27 @@
   .left {
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--line-strong);
-    background: var(--panel-2);
+    gap: 8px;
+    padding: 8px 0 8px 8px;
+    overflow: auto;
   }
   .sections {
-    flex: 0 1 auto;
-    max-height: 42%;
-    overflow: auto;
-    border-bottom: 1px solid var(--line-strong);
+    flex: none;
   }
   .settings {
-    flex: 1;
-    overflow: auto;
-    min-height: 0;
+    flex: 1 0 auto;
   }
+  /* The editor sits on a white surface, like the Board's graph. */
   .edit {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    margin: 8px 8px 8px 8px;
+    background: var(--panel);
+    border-radius: var(--radius-lg);
   }
   .device {
-    border-left: 1px solid var(--line-strong);
-    background: var(--panel-2);
-    padding: 12px 12px 8px;
+    padding: 8px 8px 8px 0;
     height: 100%;
     overflow: hidden;
     min-width: 260px;
@@ -125,7 +124,7 @@
 
   @media (max-width: 1180px) {
     .body {
-      grid-template-columns: 240px minmax(0, 1fr) auto;
+      grid-template-columns: 268px minmax(0, 1fr) auto;
     }
   }
 
@@ -138,7 +137,9 @@
     }
     .col {
       display: none;
-      border: none;
+    }
+    .left {
+      padding: 8px;
     }
     .app[data-tab='sections'] .left,
     .app[data-tab='settings'] .left,
@@ -151,32 +152,29 @@
     .app[data-tab='settings'] .sections {
       display: none;
     }
-    .app[data-tab='sections'] .sections {
-      max-height: none;
-    }
     .device {
       height: auto;
       min-height: 0;
+      padding: 8px;
     }
     .tabs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      border-top: 1px solid var(--line-strong);
       background: var(--panel);
+      box-shadow: 0 -1px 0 var(--line);
     }
     .tabs button {
       border: none;
+      border-top: 3px solid transparent;
       background: transparent;
-      padding: 11px 4px;
-      font-size: 11px;
+      padding: 10px 4px 12px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
       color: var(--dim);
     }
     .tabs button.on {
-      background: var(--accent);
-      color: var(--on-accent);
+      border-top-color: var(--accent);
+      color: var(--text);
     }
   }
 </style>

@@ -1,6 +1,8 @@
 <script lang="ts">
-    import type { SectionMode } from '../../model/types.ts';
+  import { Ellipsis, EyeOff, GripVertical, Plus } from '@lucide/svelte';
+  import type { SectionMode } from '../../model/types.ts';
   import { MODE_INFO, SECTION_ICONS } from '../icons.ts';
+  import Button from '../ui/Button.svelte';
   import Menu from '../ui/Menu.svelte';
   import { newId } from '../state/assets.ts';
   import { newSection } from '../state/defaults.ts';
@@ -69,16 +71,28 @@
           : MODE_INFO[s.mode].label;
 </script>
 
-<div class="sidebar">
+<div class="deck">
   <div class="head">
-    <h2>Sections</h2>
-    <span class="muted small">Listed on the app's home screen</span>
+    <h2 class="panel-title">Sections</h2>
+    <Menu open={addOpen} align="right" onclose={() => (addOpen = false)}>
+      {#snippet trigger()}
+        <Button variant="primary" size="sm" onclick={() => (addOpen = !addOpen)}><Plus strokeWidth={2.5} />Add a section</Button>
+      {/snippet}
+      {#each Object.entries(MODE_INFO) as [mode, info] (mode)}
+        {@const Icon = SECTION_ICONS[info.icon]}
+        <button class="item" onclick={() => add(mode as SectionMode)}>
+          <Icon />
+          <span>{info.label}<span class="desc">{info.description}</span></span>
+        </button>
+      {/each}
+    </Menu>
   </div>
 
   <ul class="list" role="listbox" aria-label="Sections">
     {#each sections as s, i (s.id)}
       {@const Icon = SECTION_ICONS[s.icon]}
       <li
+        class="card"
         class:selected={s.id === selected}
         class:drop-before={over === i && dragging !== null && dragging !== i}
         draggable="true"
@@ -97,16 +111,18 @@
         }}
         ondragend={() => (dragging = over = null)}
       >
+        <span class="grip" aria-hidden="true"><GripVertical size={14} /></span>
         <button class="row" role="option" aria-selected={s.id === selected} onclick={() => store.select({ section: s.id, slide: null, items: [] })}>
-          <span class="icon" style="background: {s.iconColor}"><Icon size={15} color="#fff" /></span>
+          <span class="icon" style="background: {s.iconColor}"><Icon size={16} color="#fff" strokeWidth={2.25} /></span>
           <span class="text">
-            <span class="title">{s.title || 'Untitled'}</span>
-            <span class="sub">{summary(s)}{s.hidden ? ' · hidden' : ''}</span>
+            <span class="name">{s.title || 'Untitled'}</span>
+            <span class="sub">{summary(s)}</span>
           </span>
+          {#if s.hidden}<span class="hidden" title="Hidden from the home screen"><EyeOff size={14} /></span>{/if}
         </button>
         <Menu open={rowMenu === s.id} align="right" onclose={() => (rowMenu = null)}>
           {#snippet trigger()}
-            <button class="more" aria-label="Section options" onclick={() => (rowMenu = rowMenu === s.id ? null : s.id)}>⋯</button>
+            <button class="more" aria-label="Section options" onclick={() => (rowMenu = rowMenu === s.id ? null : s.id)}><Ellipsis size={14} strokeWidth={2.5} /></button>
           {/snippet}
           <button class="item" onclick={() => duplicate(s.id)}>Duplicate</button>
           <button class="item" onclick={() => toggleHidden(s.id)}>{s.hidden ? 'Show on home screen' : 'Hide from home screen'}</button>
@@ -130,91 +146,86 @@
     ></li>
   </ul>
 
-  <div class="actions">
-    <Menu open={addOpen} onclose={() => (addOpen = false)}>
-      {#snippet trigger()}
-        <button class="add" onclick={() => (addOpen = !addOpen)}>+ Add section</button>
-      {/snippet}
-      {#each Object.entries(MODE_INFO) as [mode, info] (mode)}
-        {@const Icon = SECTION_ICONS[info.icon]}
-        <button class="item" onclick={() => add(mode as SectionMode)}>
-          <Icon />
-          <span>{info.label}<span class="desc">{info.description}</span></span>
-        </button>
-      {/each}
-    </Menu>
-    <button class="add ghost" onclick={pickFiles} title="Pictures, PDFs, GIFs, videos, text, Word, CSV…">Add files…</button>
-  </div>
-  <p class="drop-hint muted small">Or drop files anywhere on the page.</p>
+  <p class="foot small muted">
+    <button class="text-link" onclick={pickFiles} title="Pictures, PDFs, GIFs, videos, text, Word, CSV">Add files</button> or drop them anywhere.
+  </p>
 </div>
 
 <style>
-.sidebar {
+  .deck {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    gap: 8px;
   }
   .head {
-    padding: 10px 12px 6px;
-    display: grid;
-    gap: 1px;
-  }
-  h2 {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 0 2px 8px;
+    min-height: 36px;
   }
   .list {
     list-style: none;
     margin: 0;
     padding: 0;
-    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 6px;
   }
-  li {
+  .card {
     position: relative;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    transition: border-color 0.12s;
   }
-  li.drop-before::before {
+  .card:hover {
+    border-color: var(--card-hover);
+  }
+  .card.selected {
+    border-color: var(--accent);
+  }
+  .card.drop-before::before,
+  .end.drop-before::before {
     content: '';
     position: absolute;
-    left: 0;
-    right: 0;
-    top: -1px;
-    height: 2px;
-    background: var(--text);
+    left: 4px;
+    right: 4px;
+    top: -5px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--purple);
   }
-  li.end {
-    height: 10px;
-    border: none;
-    background: transparent;
+  .end {
+    position: relative;
+    height: 4px;
   }
-  li:hover {
-    background: var(--hover);
-  }
-  li.selected {
-    background: var(--accent-soft);
-    box-shadow: inset 3px 0 0 var(--accent);
+  .grip {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    align-self: stretch;
+    color: var(--faint);
+    cursor: grab;
+    flex: none;
   }
   .row {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
     border: none;
     background: transparent;
-    padding: 7px 10px 7px 12px;
+    padding: 8px 4px 8px 0;
     text-align: left;
     min-width: 0;
   }
   .icon {
-    width: 22px;
-    height: 22px;
-    border-radius: 2px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
     display: grid;
     place-items: center;
     flex: none;
@@ -222,67 +233,45 @@
   .text {
     display: grid;
     min-width: 0;
+    flex: 1;
   }
-  .title {
-    font-weight: 600;
+  .name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .sub {
-    font-size: 11.5px;
+    font-size: 12px;
+    color: var(--label);
+  }
+  .hidden {
+    display: grid;
     color: var(--dim);
   }
   .more {
     border: none;
-    background: transparent;
-    color: var(--faint);
-    width: 26px;
-    height: 26px;
+    border-radius: 50%;
+    background: var(--panel);
+    color: var(--label);
+    width: 24px;
+    height: 24px;
     display: grid;
     place-items: center;
-    margin-right: 4px;
+    margin-right: 8px;
     opacity: 0;
   }
-  li:hover .more,
-  li.selected .more,
+  .card:hover .more,
+  .card.selected .more,
   .more:focus-visible {
     opacity: 1;
   }
   .more:hover {
-    background: var(--line);
-    color: var(--text);
+    color: var(--purple);
   }
-  .actions {
-    display: grid;
-    gap: 4px;
-    padding: 8px 10px;
-  }
-  .actions :global(.menu-root) {
-    display: block;
-  }
-  .add {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 30px;
-    border: 1px solid var(--line-strong);
-    background: var(--panel);
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-  }
-  .add:hover {
-    background: var(--hover);
-  }
-  .add.ghost {
-    border-style: dashed;
-    color: var(--dim);
-    font-weight: 500;
-  }
-  .drop-hint {
-    text-align: center;
-    padding: 0 10px;
+  .foot {
+    padding: 0 8px;
   }
 </style>

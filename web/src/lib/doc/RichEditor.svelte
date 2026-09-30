@@ -242,7 +242,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(242, 140, 40, 0.18);
+    background: rgba(122, 129, 255, 0.2);
     pointer-events: none;
   }
   .page :global(.column-resize-handle) {
@@ -251,7 +251,7 @@
     top: 0;
     bottom: 0;
     width: 4px;
-    background: var(--accent);
+    background: var(--purple);
     pointer-events: none;
   }
   .page :global(.tableWrapper) {
@@ -300,8 +300,8 @@
     margin-top: 6px;
     font: 13px var(--mono, monospace);
     padding: 6px 8px;
-    border: 1px solid var(--accent);
-    border-radius: 6px;
+    border: 1px solid var(--purple);
+    border-radius: var(--radius-sm);
     background: var(--panel, #fff);
     color: var(--text, #1c1c1f);
   }

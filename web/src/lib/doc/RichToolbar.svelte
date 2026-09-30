@@ -180,29 +180,44 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 2px;
-    padding: 6px 8px;
+    padding: 7px 10px;
     background: var(--panel);
     border-bottom: 1px solid var(--line);
   }
+  .toolbar :global(.icon-btn.sm) {
+    width: 30px;
+    height: 30px;
+  }
+  .toolbar :global(.icon-btn.sm svg) {
+    width: 16px;
+    height: 16px;
+  }
   .sep {
     width: 1px;
-    height: 18px;
-    background: var(--line);
-    margin: 0 5px;
+    height: 20px;
+    background: var(--line-strong);
+    margin: 0 6px;
   }
   select {
-    height: 28px;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    background: var(--panel);
-    padding: 0 6px;
-    font-size: 12.5px;
+    appearance: none;
+    height: 30px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--layout) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%234a5565'/%3E%3C/svg%3E") no-repeat right 9px center;
+    padding: 0 24px 0 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label);
+    cursor: pointer;
+  }
+  select:hover {
+    background-color: var(--hover);
   }
   .style {
-    width: 104px;
+    width: 112px;
   }
   .size {
-    width: 70px;
+    width: 78px;
   }
   .pop-root {
     position: relative;
@@ -216,22 +231,24 @@
     z-index: 30;
     display: grid;
     grid-template-columns: repeat(6, 22px);
-    gap: 5px;
-    padding: 8px;
+    gap: 6px;
+    padding: 10px;
     background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 2px;
+    border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
   }
   .swatch {
     width: 22px;
     height: 22px;
-    border-radius: 2px;
+    border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.12);
     padding: 0;
   }
+  .swatch:hover {
+    box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent);
+  }
   .swatch.none {
-    background: linear-gradient(135deg, transparent 45%, var(--danger) 45%, var(--danger) 55%, transparent 55%), var(--panel);
+    background: linear-gradient(135deg, transparent 45%, var(--danger) 45%, var(--danger) 55%, transparent 55%), #fff;
   }
   .table-tools {
     display: inline-flex;
@@ -242,17 +259,17 @@
   .tt {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    height: 26px;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    background: var(--panel);
+    gap: 4px;
+    height: 28px;
+    border: none;
+    border-radius: var(--pill);
+    background: var(--purple-soft);
     font-size: 12px;
-    padding: 0 7px;
-    color: var(--dim);
+    font-weight: 700;
+    padding: 0 10px;
+    color: var(--purple);
   }
   .tt:hover {
-    color: var(--text);
-    background: var(--hover);
+    background: var(--card);
   }
 </style>

@@ -17,29 +17,24 @@
 </label>
 
 <style>
-.field {
+  .field {
     display: grid;
-    gap: 4px;
+    gap: 6px;
   }
   .field.inline {
     grid-template-columns: 1fr auto;
     align-items: center;
     gap: 10px;
+    min-height: 24px;
   }
   .label {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--dim);
-  }
-  .inline .label {
+    font-size: 12px;
     color: var(--text);
-    font-weight: 500;
-    font-size: 12.5px;
   }
   .hint {
     grid-column: 1 / -1;
-    font-size: 11.5px;
-    color: var(--faint);
+    font-size: 11px;
+    color: var(--dim);
   }
   .control {
     display: flex;

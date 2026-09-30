@@ -37,7 +37,7 @@
 
 <div class="panel">
   {#if picture}
-    <h3>Picture</h3>
+    <h3 class="group-title">Picture</h3>
     <Field label="Width">
       <Slider value={Number(picture.attrs.width ?? 100)} min={10} max={100} unit="%" oninput={(width) => picture.apply({ width })} />
     </Field>
@@ -54,7 +54,7 @@
       />
     </Field>
     <Field label="Caption">
-      <input class="text" value={String(picture.attrs.caption ?? '')} oninput={(e) => picture.apply({ caption: (e.currentTarget as HTMLInputElement).value })} />
+      <input class="field-input" value={String(picture.attrs.caption ?? '')} oninput={(e) => picture.apply({ caption: (e.currentTarget as HTMLInputElement).value })} />
     </Field>
     <PictureSettings
       adjust={picture.attrs.adjust as ImageAdjust | undefined}
@@ -62,18 +62,18 @@
       onchange={(patch) => picture.apply(patch)}
     />
   {:else if galleryImage}
-    <h3>Picture</h3>
+    <h3 class="group-title">Picture</h3>
     <Field label="Caption">
-      <input class="text" value={galleryImage.caption ?? ''} oninput={(e) => setGallery({ caption: (e.currentTarget as HTMLInputElement).value }, 'caption')} />
+      <input class="field-input" value={galleryImage.caption ?? ''} oninput={(e) => setGallery({ caption: (e.currentTarget as HTMLInputElement).value }, 'caption')} />
     </Field>
     <PictureSettings adjust={galleryImage.adjust} quality={galleryImage.quality} onchange={setGallery} />
   {:else if item}
-    <h3>{item.type === 'image' ? 'Picture' : item.type === 'text' ? 'Text box' : 'Shape'}</h3>
+    <h3 class="group-title">{item.type === 'image' ? 'Picture' : item.type === 'text' ? 'Text box' : 'Shape'}</h3>
     <div class="grid4">
-      <label>X <input type="number" value={Math.round(item.x)} onchange={(e) => set({ x: num((e.currentTarget as HTMLInputElement).value) }, 'x')} /></label>
-      <label>Y <input type="number" value={Math.round(item.y)} onchange={(e) => set({ y: num((e.currentTarget as HTMLInputElement).value) }, 'y')} /></label>
-      <label>W <input type="number" value={Math.round(item.w)} onchange={(e) => set({ w: num((e.currentTarget as HTMLInputElement).value) }, 'w')} /></label>
-      <label>H <input type="number" value={Math.round(item.h)} onchange={(e) => set({ h: num((e.currentTarget as HTMLInputElement).value) }, 'h')} /></label>
+      <label>X <input class="field-input" type="number" value={Math.round(item.x)} onchange={(e) => set({ x: num((e.currentTarget as HTMLInputElement).value) }, 'x')} /></label>
+      <label>Y <input class="field-input" type="number" value={Math.round(item.y)} onchange={(e) => set({ y: num((e.currentTarget as HTMLInputElement).value) }, 'y')} /></label>
+      <label>W <input class="field-input" type="number" value={Math.round(item.w)} onchange={(e) => set({ w: num((e.currentTarget as HTMLInputElement).value) }, 'w')} /></label>
+      <label>H <input class="field-input" type="number" value={Math.round(item.h)} onchange={(e) => set({ h: num((e.currentTarget as HTMLInputElement).value) }, 'h')} /></label>
     </div>
 
     {#if item.type === 'image'}
@@ -92,7 +92,7 @@
       </Field>
       <Field label="Rounded corners"><Slider value={img.radius} min={0} max={40} oninput={(radius) => set({ radius } as Partial<Item>, 'radius')} /></Field>
       <Field label="Caption">
-        <input class="text" value={img.caption ?? ''} oninput={(e) => set({ caption: (e.currentTarget as HTMLInputElement).value } as Partial<Item>, 'caption')} />
+        <input class="field-input" value={img.caption ?? ''} oninput={(e) => set({ caption: (e.currentTarget as HTMLInputElement).value } as Partial<Item>, 'caption')} />
       </Field>
       <PictureSettings adjust={img.adjust} quality={img.quality} onchange={(patch, key) => set(patch as Partial<Item>, key)} />
     {:else if item.type === 'text'}
@@ -100,7 +100,7 @@
       <Field label="Background"><ColorInput value={t.background} allowNone onchange={(background) => set({ background } as Partial<Item>)} /></Field>
       <Field label="Text size"><Slider value={t.fontSize ?? 13} min={8} max={40} unit="px" oninput={(fontSize) => set({ fontSize } as Partial<Item>, 'size')} /></Field>
       <Field label="Font">
-        <select class="text" value={t.font ?? ''} onchange={(e) => set({ font: ((e.currentTarget as HTMLSelectElement).value || undefined) as TextItem['font'] } as Partial<Item>)}>
+        <select class="field-input" value={t.font ?? ''} onchange={(e) => set({ font: ((e.currentTarget as HTMLSelectElement).value || undefined) as TextItem['font'] } as Partial<Item>)}>
           <option value="">App font</option>
           {#each Object.entries(FAMILY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}
         </select>
@@ -135,7 +135,7 @@
 
     {#if section?.mode === 'slides'}
       <Field label="Link (OK opens)">
-        <select class="text" value={item.link ?? ''} onchange={(e) => set({ link: (e.currentTarget as HTMLSelectElement).value || undefined })}>
+        <select class="field-input" value={item.link ?? ''} onchange={(e) => set({ link: (e.currentTarget as HTMLSelectElement).value || undefined })}>
           <option value="">Nothing</option>
           {#each sections.filter((s) => s.id !== section.id) as s (s.id)}<option value={s.id}>{s.title}</option>{/each}
         </select>
@@ -150,7 +150,7 @@
       <Toggle checked={!!item.locked} onchange={(locked) => set({ locked })} />
     </Field>
   {:else if items.length > 1}
-    <h3>{items.length} items selected</h3>
+    <h3 class="group-title">{items.length} items selected</h3>
 
   {/if}
 </div>
@@ -158,10 +158,7 @@
 <style>
   .panel {
     display: grid;
-    gap: 14px;
-  }
-  h3 {
-    font-size: 14px;
+    gap: 16px;
   }
   .grid4 {
     display: grid;
@@ -170,24 +167,14 @@
   }
   .grid4 label {
     display: grid;
-    gap: 3px;
-    font-size: 11.5px;
-    color: var(--dim);
-    font-weight: 600;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--label);
   }
-  .grid4 input,
-  .text {
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    padding: 5px 7px;
-    background: var(--panel);
-    font-size: 13px;
+  .grid4 input {
+    padding: 0 6px;
     min-width: 0;
-  }
-  .text:focus,
-  .grid4 input:focus {
-    border-color: var(--accent);
-    outline: none;
+    font-variant-numeric: tabular-nums;
   }
 </style>
