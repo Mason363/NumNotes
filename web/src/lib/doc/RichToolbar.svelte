@@ -195,23 +195,22 @@
   .sep {
     width: 1px;
     height: 20px;
-    background: var(--line-strong);
-    margin: 0 6px;
+    background: var(--line);
+    margin: 0 5px;
   }
   select {
     appearance: none;
     height: 30px;
-    border: none;
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius-sm);
-    background: var(--layout) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%234a5565'/%3E%3C/svg%3E") no-repeat right 9px center;
-    padding: 0 24px 0 10px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--label);
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23656975'/%3E%3C/svg%3E") no-repeat right 9px center;
+    padding: 0 24px 0 8px;
+    font-size: 13px;
+    color: var(--text);
     cursor: pointer;
   }
   select:hover {
-    background-color: var(--hover);
+    border-color: rgba(0, 0, 0, 0.35);
   }
   .style {
     width: 112px;
@@ -234,6 +233,7 @@
     gap: 6px;
     padding: 10px;
     background: var(--panel);
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
   }
@@ -245,7 +245,7 @@
     padding: 0;
   }
   .swatch:hover {
-    box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent);
+    box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--text);
   }
   .swatch.none {
     background: linear-gradient(135deg, transparent 45%, var(--danger) 45%, var(--danger) 55%, transparent 55%), #fff;
@@ -261,15 +261,14 @@
     align-items: center;
     gap: 4px;
     height: 28px;
-    border: none;
-    border-radius: var(--pill);
-    background: var(--purple-soft);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+    background: var(--btn);
     font-size: 12px;
-    font-weight: 700;
-    padding: 0 10px;
-    color: var(--purple);
+    padding: 0 8px;
+    color: var(--text);
   }
   .tt:hover {
-    background: var(--card);
+    background: var(--btn-hover);
   }
 </style>

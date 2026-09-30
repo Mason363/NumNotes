@@ -85,13 +85,13 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    padding: 6px 10px;
+    padding: 5px 8px;
     border-bottom: 1px solid var(--line);
-    min-height: 46px;
+    background: var(--panel);
+    min-height: 44px;
     flex-wrap: wrap;
     flex: none;
   }
-  /* Tool buttons: purple line icon and a bold label, like the Board's rail. */
   .tool {
     display: inline-flex;
     align-items: center;
@@ -99,32 +99,28 @@
     height: 32px;
     padding: 0 10px;
     border: none;
-    border-radius: var(--pill);
+    border-radius: var(--radius-sm);
     background: transparent;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--label);
-  }
-  .tool:hover {
-    background: var(--layout);
+    font-size: 13px;
     color: var(--text);
   }
+  .tool:hover {
+    background: var(--hover);
+  }
   .tool :global(svg) {
-    width: 18px;
-    height: 18px;
-    color: var(--purple);
+    width: 17px;
+    height: 17px;
+    color: var(--dim);
     stroke-width: 1.75;
   }
   .tool :global(svg.caret) {
     width: 14px;
     height: 14px;
     margin-left: -2px;
-    color: var(--label);
-    stroke-width: 2.5;
   }
   .format {
     flex: 1;
-    margin: -6px -10px;
+    margin: -5px -8px;
   }
   .format :global(.toolbar) {
     border-bottom: none;

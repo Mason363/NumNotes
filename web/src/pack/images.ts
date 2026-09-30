@@ -368,7 +368,26 @@ const size = (img: PackedImage) => img.levels.reduce((n, l) => n + l.tiles.reduc
  * Encodes one picture. `levels` are renderings of the same picture at
  * increasing sizes (level 0 is the size it has in the scene).
  */
-export function encodeImage(levels: ImageData[], q: ImageQuality, keepAlpha = false): PackedImage {
+/** How each shrink step limits picture quality and resolution. */
+export const SHRINK_STEPS = [
+  { level: 100, colors: 256, detail: 4, scale: 1 },
+  { level: 68, colors: 128, detail: 2, scale: 1 },
+  { level: 52, colors: 64, detail: 1, scale: 0.85 },
+  { level: 38, colors: 32, detail: 1, scale: 0.7 },
+] as const;
+
+export function shrinkQuality(q: ImageQuality, shrink: number): ImageQuality {
+  if (!shrink) return q;
+  const t = SHRINK_STEPS[Math.min(shrink, SHRINK_STEPS.length - 1)];
+  return {
+    ...q,
+    level: Math.min(q.level, t.level),
+    colors: Math.min(q.colors, t.colors),
+    zoomDetail: Math.min(q.zoomDetail, t.detail) as ImageQuality['zoomDetail'],
+  };
+}
+
+export function encodeImage(levels: ImageData[], q: ImageQuality, keepAlpha = false, shrink = 0): PackedImage {
   const a = analyze(levels[0]);
   const transparent = keepAlpha && a.transparent;
   switch (q.mode) {
@@ -379,16 +398,16 @@ export function encodeImage(levels: ImageData[], q: ImageQuality, keepAlpha = fa
       return encodeDct(levels, a.gray ? 'gray' : q.level >= 88 ? '444' : '420', q.level);
     case 'compact':
       if (transparent || (!a.many && a.colors.size <= 16)) return encodePalette(levels, a, { ...q, colors: Math.min(q.colors, 64) }, transparent);
-      return encodeDct(levels, a.gray ? 'gray' : '420', 50);
+      return encodeDct(levels, a.gray ? 'gray' : '420', Math.min(50, q.level));
     default: {
       if (transparent || (!a.many && a.colors.size <= q.colors)) return encodePalette(levels, a, q, transparent);
       if (a.topCoverage >= 0.7) {
         // Charts and screenshots: keep edges crisp; take whichever is smaller.
         const palette = encodePalette(levels, a, q, false);
-        const dct = encodeDct(levels, a.gray ? 'gray' : '444', 90);
+        const dct = encodeDct(levels, a.gray ? 'gray' : shrink ? '420' : '444', shrink ? Math.min(90, q.level + 20) : 90);
         return size(palette) <= size(dct) * 1.15 ? palette : dct;
       }
-      return encodeDct(levels, a.gray ? 'gray' : '420', Math.max(q.level, 60));
+      return encodeDct(levels, a.gray ? 'gray' : '420', shrink ? q.level : Math.max(q.level, 60));
     }
   }
 }

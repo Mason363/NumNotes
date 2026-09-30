@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronDown, Redo2, Undo2 } from '@lucide/svelte';
+  import { ChevronDown, Menu as MenuIcon } from '@lucide/svelte';
   import Button from '../ui/Button.svelte';
   import IconButton from '../ui/IconButton.svelte';
   import Menu from '../ui/Menu.svelte';
@@ -96,16 +96,9 @@
 </script>
 
 <header class="topbar">
-  <a class="brand" href={import.meta.env.BASE_URL} onclick={(e) => { e.preventDefault(); store.project = null; }} title="All apps">
-    <img src="{import.meta.env.BASE_URL}favicon.svg" alt="" />
-    <span class="word">NumNotes</span>
-  </a>
-
-  <span class="divider"></span>
-
   <Menu open={projectMenu} onclose={() => (projectMenu = false)}>
     {#snippet trigger()}
-      <button class="apps" onclick={() => (projectMenu = !projectMenu)} aria-haspopup="menu">My apps <ChevronDown size={14} strokeWidth={2.5} /></button>
+      <IconButton label="My apps" onclick={() => (projectMenu = !projectMenu)} aria-haspopup="menu"><MenuIcon /></IconButton>
     {/snippet}
     <button class="item" onclick={() => { projectMenu = false; store.project = null; }}>New app</button>
     <button class="item" onclick={openFile}>Open a .numnotes file</button>
@@ -113,25 +106,16 @@
     <button class="item" onclick={removeProject}>Delete this app</button>
     {#if store.projects.length > 1}
       <div class="sep"></div>
-      <div class="menu-label">Switch to</div>
+      <div class="menu-label">My apps</div>
       {#each store.projects.filter((p) => p.id !== project.id).slice(0, 8) as p (p.id)}
         <button class="item" onclick={() => switchTo(p.id)}>{p.name}</button>
       {/each}
     {/if}
   </Menu>
 
-  <span class="divider history-sep"></span>
-
-  <div class="history">
-    <IconButton label="Undo (⌘Z)" disabled={!store.canUndo} onclick={() => store.undo()}><Undo2 strokeWidth={1.75} /></IconButton>
-    <IconButton label="Redo (⇧⌘Z)" disabled={!store.canRedo} onclick={() => store.redo()}><Redo2 strokeWidth={1.75} /></IconButton>
-  </div>
-
-  <span class="divider history-sep"></span>
-
   <div class="identity">
     <button class="icon-btn" title="Change the app icon" onclick={() => (iconOpen = true)}>
-      <AppIcon icon={project.icon} size={28} />
+      <AppIcon icon={project.icon} size={26} />
     </button>
     <input
       class="name"
@@ -146,90 +130,53 @@
     />
   </div>
 
-  <div class="spacer"></div>
+  <a class="brand" href={import.meta.env.BASE_URL} onclick={(e) => { e.preventDefault(); store.project = null; }} title="All apps">
+    <img src="{import.meta.env.BASE_URL}favicon.svg" alt="" />
+    <span>NumNotes</span>
+  </a>
 
-  <div class="meter-slot"><StorageMeter /></div>
-
-  <button class="help" title="Keys on the calculator" aria-label="Help" onclick={() => (helpOpen = true)}>?</button>
-
-  <div class="dl"><Menu open={downloadMenu} align="right" onclose={() => (downloadMenu = false)}>
-    {#snippet trigger()}
-      <Button size="sm" onclick={() => (downloadMenu = !downloadMenu)} disabled={busy} aria-haspopup="menu">Download <ChevronDown strokeWidth={2.5} /></Button>
-    {/snippet}
-    <button class="item" onclick={downloadNwa}>
-      <span>App file (.nwa)<span class="desc">For my.numworks.com/apps</span></span>
-    </button>
-    <button class="item" onclick={downloadProject}>
-      <span>Project file (.numnotes)<span class="desc">Backup, or keep editing elsewhere</span></span>
-    </button>
-  </Menu></div>
-
-  <Button size="sm" variant="primary" onclick={() => (installOpen = true)}>Send<span class="long">&nbsp;to calculator</span></Button>
+  <div class="right">
+    <div class="meter-slot"><StorageMeter /></div>
+    <button class="help" title="Keys on the calculator" aria-label="Help" onclick={() => (helpOpen = true)}>?</button>
+    <div class="dl"><Menu open={downloadMenu} align="right" onclose={() => (downloadMenu = false)}>
+      {#snippet trigger()}
+        <Button size="sm" onclick={() => (downloadMenu = !downloadMenu)} disabled={busy} aria-haspopup="menu">Download <ChevronDown /></Button>
+      {/snippet}
+      <button class="item" onclick={downloadNwa}>
+        <span>App file (.nwa)<span class="desc">For my.numworks.com/apps</span></span>
+      </button>
+      <button class="item" onclick={downloadProject}>
+        <span>Project file (.numnotes)<span class="desc">Backup, or keep editing elsewhere</span></span>
+      </button>
+    </Menu></div>
+    <Button size="sm" variant="primary" onclick={() => (installOpen = true)}>Send<span class="long">&nbsp;to calculator</span></Button>
+  </div>
 </header>
 
-<IconDialog open={iconOpen} onclose={() => (iconOpen = false)} />
 <HelpDialog open={helpOpen} onclose={() => (helpOpen = false)} />
 <InstallDialog open={installOpen} onclose={() => (installOpen = false)} ondownload={downloadNwa} />
 
 <style>
   .topbar {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 0 16px 0 14px;
-    height: 48px;
+    gap: 6px;
+    height: 46px;
+    padding: 0 10px 0 6px;
     background: var(--panel);
+    border-bottom: 1px solid var(--line-strong);
     min-width: 0;
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .brand img {
-    width: 26px;
-    height: 26px;
-  }
-  .word {
-    font-weight: 800;
-    font-size: 15px;
-    letter-spacing: -0.01em;
-  }
-  .divider {
-    width: 1px;
-    height: 22px;
-    background: var(--line-strong);
-    flex: none;
-  }
-  .apps {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    border: none;
-    background: transparent;
-    padding: 6px 4px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--dim);
-  }
-  .apps:hover {
-    color: var(--text);
-  }
-  .history {
-    display: flex;
-    gap: 2px;
   }
   .identity {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     min-width: 0;
   }
   .icon-btn {
     border: none;
-    padding: 2px;
+    padding: 3px;
     background: transparent;
     display: grid;
     border-radius: var(--radius-sm);
@@ -240,59 +187,77 @@
   .name {
     border: 1px solid transparent;
     background: transparent;
-    padding: 4px 8px;
+    padding: 4px 6px;
     font-size: 15px;
-    font-weight: 700;
     width: 220px;
     min-width: 80px;
     border-radius: var(--radius-sm);
     color: var(--text);
   }
   .name:hover {
-    background: var(--layout);
+    border-color: var(--line);
   }
   .name:focus {
-    background: var(--panel);
-    border-color: var(--purple);
+    border-color: var(--blue);
     outline: none;
   }
-  .spacer {
-    flex: 1;
+  /* Centered like the desmos wordmark. */
+  .brand {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--dim);
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    text-decoration: none;
   }
-  /* Round outlined help button, as on the Board. */
+  .brand:hover {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .brand img {
+    width: 22px;
+    height: 22px;
+  }
+  .right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
   .help {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     flex: none;
-    border: 1.5px solid var(--label);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    background: transparent;
-    color: var(--label);
+    background: var(--btn);
+    color: var(--text);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
     display: grid;
     place-items: center;
   }
   .help:hover {
-    border-color: var(--purple);
-    color: var(--purple);
+    background: var(--btn-hover);
   }
   .topbar :global(.btn svg) {
     width: 14px;
     height: 14px;
   }
   @media (max-width: 1100px) {
-    .word {
+    .brand {
       display: none;
     }
   }
   @media (max-width: 640px) {
     .topbar {
-      gap: 6px;
-      padding: 0 10px;
+      gap: 4px;
+      padding: 0 8px 0 4px;
     }
-    .history,
-    .history-sep,
     .help,
     .dl,
     .meter-slot,
@@ -305,9 +270,6 @@
     }
     .identity {
       flex: 1;
-    }
-    .spacer {
-      display: none;
     }
   }
 </style>

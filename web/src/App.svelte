@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import DropZone from './lib/components/DropZone.svelte';
-  import Inspector from './lib/components/Inspector.svelte';
   import Preview from './lib/components/Preview.svelte';
   import SectionEditor from './lib/components/SectionEditor.svelte';
   import Sidebar from './lib/components/Sidebar.svelte';
@@ -11,7 +10,8 @@
   import { store } from './lib/state/project.svelte.ts';
 
   let booting = $state(true);
-  let mobileTab = $state<'sections' | 'edit' | 'preview' | 'settings'>('edit');
+  let mobileTab = $state<'sections' | 'edit' | 'preview'>('edit');
+  let listOpen = $state(true);
 
   onMount(async () => {
     await store.refreshList();
@@ -53,28 +53,31 @@
 {:else}
   <div class="app" data-tab={mobileTab}>
     <TopBar />
-    <div class="body">
-      <aside class="col left">
+    <div class="body" class:no-list={!listOpen}>
+      {#if listOpen}
         <!-- On phones, picking a section opens it. -->
-        <div
-          class="sections"
+        <aside
+          class="col list"
           role="presentation"
           onclick={(e) => {
             if (mobileTab === 'sections' && (e.target as HTMLElement).closest('[role="option"]')) mobileTab = 'edit';
           }}
         >
-          <Sidebar />
-        </div>
-        <div class="settings"><Inspector /></div>
-      </aside>
-      <main class="col edit"><SectionEditor /></main>
+          <Sidebar oncollapse={() => (listOpen = false)} />
+        </aside>
+      {/if}
+      <main class="col edit">
+        {#if !listOpen}
+          <button class="show-list" title="Show sections" aria-label="Show sections" onclick={() => (listOpen = true)}>»</button>
+        {/if}
+        <SectionEditor />
+      </main>
       <aside class="col device"><Preview /></aside>
     </div>
     <nav class="tabs">
-      <button class:on={mobileTab === 'sections'} onclick={() => (mobileTab = 'sections')}>Sections</button>
+      <button class:on={mobileTab === 'sections'} onclick={() => ((mobileTab = 'sections'), (listOpen = true))}>Sections</button>
       <button class:on={mobileTab === 'edit'} onclick={() => (mobileTab = 'edit')}>Edit</button>
-      <button class:on={mobileTab === 'preview'} onclick={() => (mobileTab = 'preview')}>Preview</button>
-      <button class:on={mobileTab === 'settings'} onclick={() => (mobileTab = 'settings')}>Settings</button>
+      <button class:on={mobileTab === 'preview'} onclick={() => (mobileTab = 'preview')}>Calculator</button>
     </nav>
   </div>
   <DropZone />
@@ -89,42 +92,54 @@
     display: grid;
     grid-template-rows: auto 1fr;
     min-height: 0;
-    background: var(--layout);
+    background: var(--bg);
   }
   .body {
     display: grid;
-    grid-template-columns: 300px minmax(0, 1fr) auto;
+    grid-template-columns: 340px minmax(0, 1fr) auto;
     min-height: 0;
+  }
+  .body.no-list {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
   .col {
     min-height: 0;
   }
-  .left {
+  .list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 8px 0 8px 8px;
-    overflow: auto;
+    background: var(--panel);
+    border-right: 1px solid var(--line-strong);
+    overflow: hidden;
   }
-  .sections {
-    flex: none;
-  }
-  .settings {
-    flex: 1 0 auto;
-  }
-  /* The editor sits on a white surface, like the Board's graph. */
   .edit {
+    position: relative;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    margin: 8px 8px 8px 8px;
-    background: var(--panel);
-    border-radius: var(--radius-lg);
+  }
+  .show-list {
+    position: absolute;
+    left: 8px;
+    top: 52px;
+    z-index: 5;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius);
+    background: var(--btn);
+    box-shadow: var(--shadow);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .show-list:hover {
+    background: var(--btn-hover);
   }
   .device {
-    padding: 8px 8px 8px 0;
     height: 100%;
     overflow: hidden;
+    border-left: 1px solid var(--line-strong);
+    background: var(--panel);
     min-width: 260px;
   }
   .tabs {
@@ -133,7 +148,7 @@
 
   @media (max-width: 1180px) {
     .body {
-      grid-template-columns: 268px minmax(0, 1fr) auto;
+      grid-template-columns: 290px minmax(0, 1fr) auto;
     }
   }
 
@@ -141,49 +156,45 @@
     .app {
       grid-template-rows: auto 1fr auto;
     }
-    .body {
+    .body,
+    .body.no-list {
       grid-template-columns: 1fr;
     }
     .col {
       display: none;
+      border: none;
     }
-    .left {
-      padding: 8px;
-    }
-    .app[data-tab='sections'] .left,
-    .app[data-tab='settings'] .left,
+    .app[data-tab='sections'] .list,
     .app[data-tab='edit'] .edit,
     .app[data-tab='preview'] .device {
       display: flex;
       flex-direction: column;
     }
-    .app[data-tab='sections'] .settings,
-    .app[data-tab='settings'] .sections {
-      display: none;
-    }
     .device {
       height: auto;
       min-height: 0;
-      padding: 8px;
+    }
+    .show-list {
+      display: none;
     }
     .tabs {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       background: var(--panel);
-      box-shadow: 0 -1px 0 var(--line);
+      border-top: 1px solid var(--line-strong);
     }
     .tabs button {
       border: none;
       border-top: 3px solid transparent;
       background: transparent;
-      padding: 10px 4px 12px;
-      font-size: 12px;
-      font-weight: 700;
+      padding: 9px 4px 11px;
+      font-size: 13px;
       color: var(--dim);
     }
     .tabs button.on {
       border-top-color: var(--accent);
       color: var(--text);
+      font-weight: 600;
     }
   }
 </style>

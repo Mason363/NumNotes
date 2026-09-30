@@ -32,33 +32,34 @@
 <style>
   .seg {
     display: inline-flex;
-    gap: 2px;
-    padding: 2px;
-    border-radius: var(--pill);
-    background: var(--field);
     width: 100%;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--panel);
   }
   button {
     flex: 1;
     border: none;
-    border-radius: var(--pill);
+    border-left: 1px solid var(--line);
     background: transparent;
-    height: 28px;
-    padding: 0 10px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--label);
+    height: 30px;
+    padding: 0 8px;
+    font-size: 13px;
+    color: var(--text);
     white-space: nowrap;
-    transition: background-color 0.12s, color 0.12s;
+  }
+  button:first-child {
+    border-left: none;
   }
   .small button {
-    height: 24px;
+    height: 28px;
   }
   button:hover:not(.on) {
     background: var(--hover);
   }
   button.on {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--select);
+    font-weight: 600;
   }
 </style>

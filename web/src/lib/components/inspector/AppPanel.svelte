@@ -74,6 +74,9 @@
   <Field label="Bookmarks" inline><Toggle checked={project.settings.bookmarks} onchange={(v) => setSetting('bookmarks', v)} /></Field>
   <Field label="Battery" inline><Toggle checked={project.settings.battery} onchange={(v) => setSetting('battery', v)} /></Field>
   <Field label="Key hints" inline><Toggle checked={project.settings.hints} onchange={(v) => setSetting('hints', v)} /></Field>
+  <Field label="Shrink pictures to fit" inline hint="When the app is too big for the calculator.">
+    <Toggle checked={project.settings.autoShrink !== false} onchange={(v) => setSetting('autoShrink', v)} />
+  </Field>
 </div>
 
 <style>
@@ -91,17 +94,16 @@
     width: 100%;
   }
   .preset {
-    border: 2px solid transparent;
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     padding: 0 0 8px;
     overflow: hidden;
     display: grid;
     gap: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+    font-size: 13px;
   }
   .preset.on {
+    box-shadow: 0 0 0 2px var(--accent);
     border-color: var(--accent);
   }
   .bar {

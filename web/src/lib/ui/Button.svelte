@@ -13,18 +13,16 @@
 <button class="btn {variant} {size} {cls}" {...rest}>{@render children?.()}</button>
 
 <style>
-  /* NumWorks buttons: bold pills. Yellow for the main action, grey outline
-   * for the rest. */
+  /* Flat grey buttons like Desmos; yellow for the one main action. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    border: 1px solid transparent;
-    border-radius: var(--pill);
-    font-weight: 700;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+    font-weight: 400;
     white-space: nowrap;
-    transition: background-color 0.12s, border-color 0.12s, color 0.12s;
   }
   .btn:disabled {
     opacity: 0.45;
@@ -32,61 +30,57 @@
   }
   .sm {
     height: 28px;
-    padding: 0 12px;
-    font-size: 12px;
-  }
-  .md {
-    height: 32px;
-    padding: 0 14px;
+    padding: 0 10px;
     font-size: 13px;
   }
+  .md {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
   .lg {
-    height: 38px;
-    padding: 0 18px;
+    height: 40px;
+    padding: 0 20px;
     font-size: 15px;
+  }
+  .secondary {
+    background: var(--btn);
+    color: var(--text);
+  }
+  .secondary:hover:not(:disabled) {
+    background: var(--btn-hover);
   }
   .primary {
     background: var(--accent);
-    border-color: var(--accent);
-    color: var(--on-accent);
+    border-color: var(--accent-strong);
+    color: #fff;
+    font-weight: 600;
   }
   .primary:hover:not(:disabled) {
     background: var(--accent-strong);
-    border-color: var(--accent-strong);
   }
   .purple {
-    background: var(--purple);
-    border-color: var(--purple);
+    background: var(--blue);
+    border-color: var(--purple-strong);
     color: #fff;
   }
   .purple:hover:not(:disabled) {
     background: var(--purple-strong);
-    border-color: var(--purple-strong);
-  }
-  .secondary {
-    background: transparent;
-    border-color: var(--grey-btn);
-    color: var(--grey-btn);
-  }
-  .secondary:hover:not(:disabled) {
-    background: var(--grey-btn);
-    color: var(--panel);
   }
   .ghost {
     background: transparent;
-    color: var(--label);
+    border-color: transparent;
+    color: var(--text);
   }
   .ghost:hover:not(:disabled) {
     background: var(--hover);
   }
   .danger {
-    background: transparent;
+    background: var(--btn);
     color: var(--danger);
-    border-color: var(--danger);
   }
   .danger:hover:not(:disabled) {
-    background: var(--danger);
-    color: #fff;
+    background: var(--btn-hover);
   }
   .btn :global(svg) {
     width: 16px;

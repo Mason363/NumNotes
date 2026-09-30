@@ -79,7 +79,7 @@
 
 **Does it work in exam mode?** No. NumWorks hides third-party apps during exam mode.
 
-**How much fits?** Usually a couple of megabytes. The meter at the top shows how much your app uses. Photos set to Compact take the least space.
+**How much fits?** Usually a couple of megabytes. The meter at the top shows how much your app uses. If your app gets too big, NumNotes shrinks its pictures until it fits, and you can shrink any section further in its settings.
 
 **Where are my projects?** In your browser. Use Download, then Project file, to keep a backup or move to another computer.
 

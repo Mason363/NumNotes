@@ -48,7 +48,7 @@
     color: var(--text);
   }
   dialog::backdrop {
-    background: rgba(30, 33, 56, 0.4);
+    background: rgba(0, 0, 0, 0.3);
   }
   .box {
     background: var(--panel);
@@ -63,28 +63,28 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 16px 4px 20px;
+    padding: 14px 12px 6px 20px;
   }
   h2 {
     font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
+    font-weight: 600;
   }
   .close {
     border: none;
-    border-radius: 50%;
-    background: var(--layout);
-    color: var(--label);
-    width: 28px;
-    height: 28px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--dim);
+    width: 30px;
+    height: 30px;
     display: grid;
     place-items: center;
   }
   .close:hover {
-    background: var(--card);
+    background: var(--hover);
+    color: var(--text);
   }
   .body {
-    padding: 12px 20px 20px;
+    padding: 10px 20px 20px;
     overflow: auto;
   }
   footer {
@@ -92,6 +92,6 @@
     justify-content: flex-end;
     gap: 8px;
     padding: 12px 20px;
-    background: var(--layout);
+    border-top: 1px solid var(--line);
   }
 </style>

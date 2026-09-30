@@ -37,7 +37,6 @@
 
 <div class="panel">
   {#if picture}
-    <h3 class="group-title">Picture</h3>
     <Field label="Width">
       <Slider value={Number(picture.attrs.width ?? 100)} min={10} max={100} unit="%" oninput={(width) => picture.apply({ width })} />
     </Field>
@@ -64,13 +63,11 @@
       onchange={(patch) => picture.apply('crop' in patch ? { ...patch, crop: patch.crop ?? null } : patch)}
     />
   {:else if galleryImage}
-    <h3 class="group-title">Picture</h3>
     <Field label="Caption">
       <input class="field-input" value={galleryImage.caption ?? ''} oninput={(e) => setGallery({ caption: (e.currentTarget as HTMLInputElement).value }, 'caption')} />
     </Field>
     <PictureSettings asset={galleryImage.asset} crop={galleryImage.crop} adjust={galleryImage.adjust} quality={galleryImage.quality} onchange={setGallery} />
   {:else if item}
-    <h3 class="group-title">{item.type === 'image' ? 'Picture' : item.type === 'text' ? 'Text box' : 'Shape'}</h3>
     <div class="grid4">
       <label>X <input class="field-input" type="number" value={Math.round(item.x)} onchange={(e) => set({ x: num((e.currentTarget as HTMLInputElement).value) }, 'x')} /></label>
       <label>Y <input class="field-input" type="number" value={Math.round(item.y)} onchange={(e) => set({ y: num((e.currentTarget as HTMLInputElement).value) }, 'y')} /></label>
@@ -152,7 +149,7 @@
       <Toggle checked={!!item.locked} onchange={(locked) => set({ locked })} />
     </Field>
   {:else if items.length > 1}
-    <h3 class="group-title">{items.length} items selected</h3>
+    <p class="muted small">{items.length} items selected. Use the toolbar to move, copy or delete them together.</p>
 
   {/if}
 </div>

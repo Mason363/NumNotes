@@ -45,17 +45,17 @@
   </header>
 
   <section class="hero">
-    <h1>Your notes, on your calculator</h1>
-    <p class="lead">Turn notes, pictures, PDFs and schedules into an app for your NumWorks.</p>
+    <h1>Make an app for your NumWorks</h1>
+    <p class="lead">Notes, pictures, PDFs and schedules, on your calculator.</p>
   </section>
 
   <main>
     <section class="card">
-      <h2 class="panel-title">Pick a template to start</h2>
+      <h2>Start from</h2>
       <div class="tiles">
         {#each TEMPLATES as t, i (t.id)}
           <button class="tile" onclick={() => start(t)}>
-            <AppIcon icon={icons[i]} size={48} />
+            <AppIcon icon={icons[i]} size={40} />
             <span class="tile-name">{t.title}</span>
             <span class="tile-desc">{t.description}</span>
           </button>
@@ -65,7 +65,7 @@
 
     {#if store.projects.length}
       <section class="card">
-        <h2 class="panel-title">Your apps</h2>
+        <h2>Your apps</h2>
         <ul class="rows">
           {#each store.projects as p (p.id)}
             <li>
@@ -101,23 +101,23 @@
 <style>
   .page {
     min-height: 100%;
-    background: var(--layout);
+    background: var(--bg);
   }
   .nav {
     display: flex;
     align-items: center;
     gap: 20px;
-    height: 56px;
-    padding: 0 24px;
+    height: 46px;
+    padding: 0 16px;
     background: var(--panel);
+    border-bottom: 1px solid var(--line-strong);
   }
   .brand {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-size: 17px;
+    color: var(--text);
   }
   .spacer {
     flex: 1;
@@ -127,106 +127,98 @@
     background: transparent;
     padding: 0;
     font-size: 14px;
+    color: var(--dim);
+  }
+  .nav-link:hover {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .hero {
+    text-align: center;
+    padding: 48px 20px 28px;
+  }
+  h1 {
+    font-size: 30px;
     font-weight: 400;
     color: var(--text);
   }
-  .nav-link:hover {
-    color: var(--purple);
-    text-decoration: none;
-  }
-  /* Thin headline and lead, like numworks.com. */
-  .hero {
-    text-align: center;
-    padding: 56px 20px 36px;
-    background: linear-gradient(0deg, var(--layout), var(--panel));
-  }
-  h1 {
-    font-size: 38px;
-    font-weight: 300;
-    color: var(--text);
-    letter-spacing: -0.01em;
-  }
   .lead {
-    margin-top: 10px;
-    font-size: 18px;
-    font-weight: 300;
-    color: var(--label);
+    margin-top: 8px;
+    font-size: 16px;
+    color: var(--dim);
   }
   main {
-    max-width: 820px;
+    max-width: 860px;
     margin: 0 auto;
     padding: 0 20px 48px;
     display: grid;
-    gap: 16px;
+    gap: 28px;
   }
-  /* The Board's "Select an app" card. */
   .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 14px 8px 8px;
     display: grid;
-    gap: 12px;
+    gap: 10px;
   }
   .card > h2 {
-    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
   .tiles {
-    background: var(--panel);
-    border-radius: var(--radius);
-    padding: 12px;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 4px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
   }
   .tile {
     display: grid;
-    justify-items: center;
-    align-content: start;
-    gap: 4px;
-    border: 2px solid transparent;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    align-items: center;
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     background: var(--panel);
-    padding: 12px 6px 10px;
-    text-align: center;
+    padding: 12px 14px;
+    text-align: left;
   }
   .tile:hover {
-    background: var(--layout);
-  }
-  .tile:hover .tile-name {
-    color: var(--text);
+    border-color: rgba(0, 0, 0, 0.35);
+    box-shadow: var(--shadow);
   }
   .tile :global(canvas) {
-    margin-bottom: 4px;
+    grid-row: 1 / 3;
   }
   .tile-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--label);
+    font-size: 15px;
+    color: var(--text);
+    align-self: end;
   }
   .tile-desc {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--dim);
+    align-self: start;
   }
   .rows {
     list-style: none;
     margin: 0;
-    padding: 6px;
+    padding: 0;
     background: var(--panel);
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
-    display: grid;
+    overflow: hidden;
   }
   .rows li {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-right: 6px;
-    border-radius: var(--radius-sm);
+    padding-right: 10px;
   }
   .rows li + li {
-    box-shadow: 0 -1px 0 var(--line);
+    border-top: 1px solid var(--line);
   }
   .rows li:hover {
-    background: var(--layout);
+    background: var(--hover);
   }
   .row {
     flex: 1;
@@ -235,13 +227,13 @@
     gap: 12px;
     border: none;
     background: transparent;
-    padding: 10px 10px;
+    padding: 12px 14px;
     text-align: left;
     min-width: 0;
   }
   .name {
-    font-weight: 700;
-    color: var(--purple);
+    font-size: 15px;
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -255,7 +247,7 @@
     width: 28px;
     height: 28px;
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--faint);
     display: grid;
@@ -263,32 +255,28 @@
   }
   .del:hover {
     color: var(--danger);
-    background: var(--panel);
+    background: var(--btn);
   }
   footer {
     display: grid;
     gap: 6px;
     justify-items: center;
     text-align: center;
-    padding-top: 8px;
   }
   @media (max-width: 720px) {
     .tiles {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr 1fr;
     }
   }
-  @media (max-width: 560px) {
-    h1 {
-      font-size: 28px;
+  @media (max-width: 480px) {
+    .tiles {
+      grid-template-columns: 1fr;
     }
-    .lead {
-      font-size: 16px;
+    h1 {
+      font-size: 24px;
     }
     .when {
       display: none;
-    }
-    .nav {
-      padding: 0 16px;
     }
   }
 </style>

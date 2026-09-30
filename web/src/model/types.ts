@@ -115,6 +115,8 @@ interface SectionBase {
   background?: string;
   hidden?: boolean;
   statusBar: boolean;
+  /** Shrinks this section's pictures: 0 none, 1 smaller, 2 much smaller, 3 smallest. */
+  shrink?: 0 | 1 | 2 | 3;
 }
 
 export interface SlidesSection extends SectionBase {
@@ -184,6 +186,8 @@ export interface AppSettings {
   bookmarks: boolean;
   battery: boolean;
   hints: boolean;
+  /** Shrink pictures automatically when the app is too big (default on). */
+  autoShrink?: boolean;
 }
 
 export interface Project {

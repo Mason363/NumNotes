@@ -25,15 +25,15 @@
     grid-template-columns: 1fr auto;
     align-items: center;
     gap: 10px;
-    min-height: 24px;
+    min-height: 26px;
   }
   .label {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text);
   }
   .hint {
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--dim);
   }
   .control {

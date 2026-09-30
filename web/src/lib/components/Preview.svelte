@@ -155,11 +155,12 @@
     align-content: start;
     gap: 8px;
     height: 100%;
+    padding: 12px 14px 8px;
   }
   /* The product photo has its own studio backdrop; show it as a card. */
   .photo {
     position: relative;
-    height: calc(100vh - 110px);
+    height: calc(100vh - 116px);
     min-height: 420px;
     user-select: none;
     border-radius: var(--radius-lg);
@@ -180,7 +181,7 @@
     background: #000;
   }
   .screen.focused {
-    outline: 3px solid var(--purple);
+    outline: 3px solid var(--blue);
     outline-offset: 3px;
     border-radius: 2px;
   }
@@ -213,10 +214,10 @@
     cursor: pointer;
   }
   .key:hover {
-    background: rgba(122, 129, 255, 0.12);
+    background: rgba(0, 0, 0, 0.06);
   }
   .key.down {
-    background: rgba(122, 129, 255, 0.3);
+    background: rgba(0, 0, 0, 0.16);
   }
   .key.mod {
     background: rgba(255, 183, 52, 0.45);

@@ -41,7 +41,7 @@
     appearance: none;
     height: 4px;
     border-radius: 2px;
-    background: linear-gradient(to right, var(--accent) var(--pct), var(--field) var(--pct));
+    background: linear-gradient(to right, var(--accent) var(--pct), #d9d9d9 var(--pct));
     min-width: 60px;
     cursor: pointer;
   }
@@ -51,22 +51,21 @@
     height: 16px;
     border-radius: 50%;
     background: #fff;
-    border: 2px solid var(--accent);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
   input::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: #fff;
-    border: 2px solid var(--accent);
+    border: 1px solid rgba(0, 0, 0, 0.25);
   }
   .value {
     min-width: 40px;
     text-align: right;
     font-size: 12px;
-    font-weight: 700;
-    color: var(--label);
+    color: var(--dim);
     font-variant-numeric: tabular-nums;
   }
 </style>

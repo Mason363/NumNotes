@@ -26,6 +26,10 @@ class BuildStore {
   appBytes = $state(0);
   capacity = $state(DEFAULT_CAPACITY);
   capacityKnown = $state(false);
+  /** How much pictures were shrunk automatically to fit (0 = not at all). */
+  autoShrink = $state(0);
+  /** True when the app is too big even at the strongest shrink. */
+  tooBig = $state(false);
   /** Bumped after every successful build. */
   version = $state(0);
   bundle: Uint8Array | null = null;
@@ -81,24 +85,37 @@ class BuildStore {
     this.error = null;
     try {
       const { provider, math } = await prepareMath(snapshot);
-      const result = await buildBundle(snapshot, provider, {
-        math,
-        onProgress: (f, label) => {
-          this.progress = f;
-          this.label = label;
-        },
-      });
+      const icon = await iconNwi(snapshot).catch(() => null);
+      const viewer = await loadViewer().catch(() => null);
+      const sizeOf = (bundle: Uint8Array) =>
+        icon && viewer
+          ? appSize(makeNwa(viewer, { name: snapshot.name, projectId: snapshot.projectId, icon, bundle }))
+          : Math.ceil((bundle.length + 48 * 1024) / 65536) * 65536 + 65536;
+      // Build as set; if it doesn't fit, shrink every picture a step at a time.
+      const auto = snapshot.settings.autoShrink !== false;
+      let shrink = 0;
+      let result: BuildResult;
+      let bytes: number;
+      for (;;) {
+        result = await buildBundle(snapshot, provider, {
+          math,
+          shrink,
+          onProgress: (f, label) => {
+            this.progress = f;
+            this.label = shrink ? `${label} (shrinking pictures)` : label;
+          },
+        });
+        bytes = sizeOf(result.bundle);
+        if (!auto || bytes <= this.capacity || shrink >= 3 || !result.stats.images) break;
+        shrink++;
+      }
       this.bundle = result.bundle;
       this.builtRevision = revision;
       this.stats = result.stats;
       this.warnings = result.warnings;
-      try {
-        const icon = await iconNwi(snapshot);
-        const viewer = await loadViewer();
-        this.appBytes = appSize(makeNwa(viewer, { name: snapshot.name, projectId: snapshot.projectId, icon, bundle: result.bundle }));
-      } catch {
-        this.appBytes = Math.ceil((result.bundle.length + 48 * 1024) / 65536) * 65536 + 65536;
-      }
+      this.appBytes = bytes;
+      this.autoShrink = shrink;
+      this.tooBig = bytes > this.capacity;
       this.version++;
     } catch (e) {
       this.error = (e as Error).message;

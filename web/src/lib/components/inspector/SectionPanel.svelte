@@ -33,6 +33,13 @@
     }, key ? `${key}:${slideId}` : '');
   }
 
+  const SHRINK_HINTS = [
+    'Pictures at full quality.',
+    'A bit smaller. Hard to tell apart.',
+    'Much smaller. Pictures get softer.',
+    'Smallest. Fine for reference photos.',
+  ];
+
   const BOARD_SIZES = [
     { label: 'Small', w: 640, h: 480 },
     { label: 'Medium', w: 960, h: 720 },
@@ -62,6 +69,21 @@
     {#if section.mode !== 'notes'}
       <Field label="Background">
         <ColorInput value={section.background} allowNone swatches={['#ffffff', '#f6efe2', '#fff8e1', '#eef6ff', '#f1f1f4', '#1c1c1f', '#000000', '#10243e']} onchange={(c) => set((s) => (s.background = c))} />
+      </Field>
+    {/if}
+    {#if section.mode !== 'notes'}
+      <Field label="Shrink pictures" hint={SHRINK_HINTS[section.shrink ?? 0]}>
+        <Segmented
+          value={section.shrink ?? 0}
+          small
+          options={[
+            { value: 0, label: 'Off' },
+            { value: 1, label: 'Smaller' },
+            { value: 2, label: 'More' },
+            { value: 3, label: 'Most' },
+          ]}
+          onchange={(v) => set((s) => (s.shrink = v as 0 | 1 | 2 | 3))}
+        />
       </Field>
     {/if}
     <Field label="Status bar" inline>
@@ -172,19 +194,20 @@
   }
   .ic {
     aspect-ratio: 1;
-    border-radius: 7px;
-    border: none;
-    background: var(--field);
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel);
     display: grid;
     place-items: center;
-    color: var(--label);
+    color: var(--dim);
   }
   .ic:hover {
     color: var(--text);
-    box-shadow: inset 0 0 0 1px var(--line-strong);
+    background: var(--hover);
   }
   .ic.on {
     background: var(--c);
+    border-color: var(--c);
     color: #fff;
   }
   .grid2 {

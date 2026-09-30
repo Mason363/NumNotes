@@ -23,11 +23,11 @@
   .switch {
     appearance: none;
     position: relative;
-    width: 30px;
+    width: 32px;
     height: 18px;
     margin: 0;
     border-radius: 9px;
-    background: #a1a1a1;
+    background: #c4c7cf;
     cursor: pointer;
     flex: none;
     transition: background-color 0.15s;
@@ -48,6 +48,6 @@
     background: var(--accent);
   }
   .switch:checked::after {
-    transform: translateX(12px);
+    transform: translateX(14px);
   }
 </style>

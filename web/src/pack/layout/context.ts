@@ -30,6 +30,8 @@ export interface PictureRequest {
   noDetail?: boolean;
   /** Also keep a half-size copy for zoomed-out views (canvases). */
   zoomOut?: boolean;
+  /** Set by the builder: how hard to compress (0..3). */
+  shrink?: number;
 }
 
 export interface PictureResult {

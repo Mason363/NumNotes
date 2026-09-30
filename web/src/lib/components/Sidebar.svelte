@@ -1,15 +1,23 @@
 <script lang="ts">
-  import { Ellipsis, EyeOff, GripVertical, Plus } from '@lucide/svelte';
+  import { ChevronsLeft, EyeOff, Plus, Redo2, Settings, Undo2, X } from '@lucide/svelte';
   import type { SectionMode } from '../../model/types.ts';
   import { MODE_INFO, SECTION_ICONS } from '../icons.ts';
-  import Button from '../ui/Button.svelte';
+  import IconButton from '../ui/IconButton.svelte';
   import Menu from '../ui/Menu.svelte';
+  import Popover from '../ui/Popover.svelte';
+  import AppPanel from './inspector/AppPanel.svelte';
   import { newId } from '../state/assets.ts';
   import { newSection } from '../state/defaults.ts';
   import { store } from '../state/project.svelte.ts';
   import { pickFiles } from './DropZone.svelte';
 
-  let addOpen = $state(false);
+  interface Props {
+    oncollapse?: () => void;
+  }
+  let { oncollapse }: Props = $props();
+
+  let addOpen = $state<'top' | 'bottom' | null>(null);
+  let appOpen = $state(false);
   let rowMenu = $state<string | null>(null);
   let dragging = $state<number | null>(null);
   let over = $state<number | null>(null);
@@ -18,7 +26,7 @@
   const selected = $derived(store.section?.id);
 
   function add(mode: SectionMode) {
-    addOpen = false;
+    addOpen = null;
     const section = newSection(mode, undefined, sections.length);
     store.edit((p) => p.sections.push(section));
     store.select({ section: section.id, slide: null, items: [] });
@@ -61,38 +69,52 @@
     });
   }
 
-  const summary = (s: (typeof sections)[number]) =>
-    s.mode === 'slides'
-      ? `${s.slides.length} slide${s.slides.length === 1 ? '' : 's'}`
-      : s.mode === 'gallery'
-        ? `${s.images.length} picture${s.images.length === 1 ? '' : 's'}`
-        : s.mode === 'notes'
-          ? `${s.notes.length} starter note${s.notes.length === 1 ? '' : 's'}`
-          : MODE_INFO[s.mode].label;
+  const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
+  function summary(s: (typeof sections)[number]): string {
+    const mode = MODE_INFO[s.mode].label;
+    switch (s.mode) {
+      case 'slides':
+        return `${mode} · ${plural(s.slides.length, 'slide')}`;
+      case 'gallery':
+        return `${mode} · ${plural(s.images.length, 'picture')}`;
+      case 'notes':
+        return s.notes.length ? `${mode} · ${plural(s.notes.length, 'starter note')}` : mode;
+      case 'canvas':
+        return s.items.length ? `${mode} · ${plural(s.items.length, 'item')}` : mode;
+      default:
+        return mode;
+    }
+  }
 </script>
 
-<div class="deck">
-  <div class="head">
-    <h2 class="panel-title">Sections</h2>
-    <Menu open={addOpen} align="right" onclose={() => (addOpen = false)}>
+<div class="list-panel">
+  <div class="topbar">
+    <Menu open={addOpen === 'top'} onclose={() => (addOpen = null)}>
       {#snippet trigger()}
-        <Button variant="primary" size="sm" onclick={() => (addOpen = !addOpen)}><Plus strokeWidth={2.5} />Add a section</Button>
+        <IconButton label="Add" onclick={() => (addOpen = addOpen === 'top' ? null : 'top')}><Plus strokeWidth={2.5} /></IconButton>
       {/snippet}
-      {#each Object.entries(MODE_INFO) as [mode, info] (mode)}
-        {@const Icon = SECTION_ICONS[info.icon]}
-        <button class="item" onclick={() => add(mode as SectionMode)}>
-          <Icon />
-          <span>{info.label}<span class="desc">{info.description}</span></span>
-        </button>
-      {/each}
+      {@render addItems()}
     </Menu>
+    <span class="history">
+      <IconButton label="Undo (⌘Z)" disabled={!store.canUndo} onclick={() => store.undo()}><Undo2 /></IconButton>
+      <IconButton label="Redo (⇧⌘Z)" disabled={!store.canRedo} onclick={() => store.redo()}><Redo2 /></IconButton>
+    </span>
+    <span class="spacer"></span>
+    <Popover open={appOpen} title="App settings" align="left" onclose={() => (appOpen = false)}>
+      {#snippet trigger()}
+        <IconButton label="App settings" active={appOpen} onclick={() => (appOpen = !appOpen)}><Settings /></IconButton>
+      {/snippet}
+      <AppPanel />
+    </Popover>
+    {#if oncollapse}
+      <IconButton label="Hide sections" class="collapse" onclick={oncollapse}><ChevronsLeft /></IconButton>
+    {/if}
   </div>
 
-  <ul class="list" role="listbox" aria-label="Sections">
+  <ul class="rows" role="listbox" aria-label="Sections">
     {#each sections as s, i (s.id)}
       {@const Icon = SECTION_ICONS[s.icon]}
       <li
-        class="card"
         class:selected={s.id === selected}
         class:drop-before={over === i && dragging !== null && dragging !== i}
         draggable="true"
@@ -111,7 +133,7 @@
         }}
         ondragend={() => (dragging = over = null)}
       >
-        <span class="grip" aria-hidden="true"><GripVertical size={14} /></span>
+        <span class="tab" title="Drag to reorder">{i + 1}</span>
         <button class="row" role="option" aria-selected={s.id === selected} onclick={() => store.select({ section: s.id, slide: null, items: [] })}>
           <span class="icon" style="background: {s.iconColor}"><Icon size={16} color="#fff" strokeWidth={2.25} /></span>
           <span class="text">
@@ -122,17 +144,16 @@
         </button>
         <Menu open={rowMenu === s.id} align="right" onclose={() => (rowMenu = null)}>
           {#snippet trigger()}
-            <button class="more" aria-label="Section options" onclick={() => (rowMenu = rowMenu === s.id ? null : s.id)}><Ellipsis size={14} strokeWidth={2.5} /></button>
+            <button class="more" aria-label="Section options" onclick={() => (rowMenu = rowMenu === s.id ? null : s.id)}>⋯</button>
           {/snippet}
           <button class="item" onclick={() => duplicate(s.id)}>Duplicate</button>
           <button class="item" onclick={() => toggleHidden(s.id)}>{s.hidden ? 'Show on home screen' : 'Hide from home screen'}</button>
-          <div class="sep"></div>
-          <button class="item" onclick={() => remove(s.id)}>Delete section</button>
         </Menu>
+        <button class="delete" aria-label="Delete section" title="Delete" onclick={() => remove(s.id)}><X size={16} /></button>
       </li>
     {/each}
     <li
-      class="end"
+      class="new"
       class:drop-before={over === sections.length && dragging !== null}
       ondragover={(e) => {
         if (dragging === null) return;
@@ -143,73 +164,105 @@
         e.preventDefault();
         drop(sections.length);
       }}
-    ></li>
+    >
+      <span class="tab">{sections.length + 1}</span>
+      <Menu open={addOpen === 'bottom'} onclose={() => (addOpen = null)}>
+        {#snippet trigger()}
+          <button class="row placeholder" onclick={() => (addOpen = addOpen === 'bottom' ? null : 'bottom')}>Add a section</button>
+        {/snippet}
+        {@render addItems()}
+      </Menu>
+    </li>
   </ul>
 
-  <p class="foot small muted">
-    <button class="text-link" onclick={pickFiles} title="Pictures, PDFs, GIFs, videos, text, Word, CSV">Add files</button> or drop them anywhere.
-  </p>
+  <p class="foot">Drop pictures, PDFs and documents anywhere, or <button class="text-link" onclick={pickFiles}>choose files</button>.</p>
 </div>
 
+{#snippet addItems()}
+  {#each Object.entries(MODE_INFO) as [mode, info] (mode)}
+    {@const Icon = SECTION_ICONS[info.icon]}
+    <button class="item" onclick={() => add(mode as SectionMode)}>
+      <Icon />
+      <span>{info.label}<span class="desc">{info.description}</span></span>
+    </button>
+  {/each}
+  <div class="sep"></div>
+  <button
+    class="item"
+    onclick={() => {
+      addOpen = null;
+      pickFiles();
+    }}><span>Files<span class="desc">Pictures, PDFs, GIFs, Word, text</span></span></button
+  >
+{/snippet}
+
 <style>
-  .deck {
+  .list-panel {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    height: 100%;
+    min-height: 0;
   }
-  .head {
+  .topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 4px 0 2px 8px;
-    min-height: 36px;
+    gap: 2px;
+    height: 46px;
+    padding: 0 6px;
+    border-bottom: 1px solid var(--line-strong);
+    flex: none;
   }
-  .list {
+  .history {
+    display: flex;
+    margin-left: 8px;
+  }
+  .spacer {
+    flex: 1;
+  }
+  .rows {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: 6px;
+    overflow: auto;
+    flex: 0 1 auto;
   }
-  .card {
+  li {
     position: relative;
     display: flex;
-    align-items: center;
-    background: var(--card);
-    border: 2px solid transparent;
-    border-radius: var(--radius);
-    transition: border-color 0.12s;
+    align-items: stretch;
+    min-height: 56px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
   }
-  .card:hover {
-    border-color: var(--card-hover);
-  }
-  .card.selected {
-    border-color: var(--accent);
-  }
-  .card.drop-before::before,
-  .end.drop-before::before {
+  li.drop-before::before {
     content: '';
     position: absolute;
-    left: 4px;
-    right: 4px;
-    top: -5px;
+    left: 0;
+    right: 0;
+    top: -2px;
     height: 3px;
-    border-radius: 2px;
-    background: var(--purple);
+    background: var(--accent);
+    z-index: 1;
   }
-  .end {
-    position: relative;
-    height: 4px;
-  }
-  .grip {
-    display: grid;
-    place-items: center;
-    width: 18px;
-    align-self: stretch;
-    color: var(--faint);
-    cursor: grab;
+  /* The numbered tab down the left edge, as in Desmos. */
+  .tab {
+    width: 38px;
     flex: none;
+    background: var(--tab);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 11px;
+    padding: 3px 0 0 4px;
+    cursor: grab;
+    user-select: none;
+  }
+  li.selected .tab {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  li.selected {
+    background: #fffcf5;
   }
   .row {
     flex: 1;
@@ -218,14 +271,14 @@
     gap: 10px;
     border: none;
     background: transparent;
-    padding: 8px 4px 8px 0;
+    padding: 8px 8px 8px 12px;
     text-align: left;
     min-width: 0;
   }
   .icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 7px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     display: grid;
     place-items: center;
     flex: none;
@@ -236,8 +289,7 @@
     flex: 1;
   }
   .name {
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 15px;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
@@ -245,33 +297,67 @@
   }
   .sub {
     font-size: 12px;
-    color: var(--label);
+    color: var(--dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .hidden {
     display: grid;
-    color: var(--dim);
+    color: var(--faint);
   }
-  .more {
+  .more,
+  .delete {
+    align-self: center;
     border: none;
-    border-radius: 50%;
-    background: var(--panel);
-    color: var(--label);
-    width: 24px;
-    height: 24px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--faint);
+    width: 28px;
+    height: 28px;
     display: grid;
     place-items: center;
-    margin-right: 8px;
+    font-size: 16px;
     opacity: 0;
   }
-  .card:hover .more,
-  .card.selected .more,
-  .more:focus-visible {
+  .delete {
+    margin-right: 4px;
+  }
+  li:hover .more,
+  li:hover .delete,
+  li.selected .more,
+  li.selected .delete,
+  .more:focus-visible,
+  .delete:focus-visible {
     opacity: 1;
   }
-  .more:hover {
-    color: var(--purple);
+  .more:hover,
+  .delete:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+  li.new :global(.menu-root) {
+    flex: 1;
+  }
+  .placeholder {
+    width: 100%;
+    color: var(--faint);
+    font-size: 15px;
+  }
+  .placeholder:hover {
+    color: var(--dim);
   }
   .foot {
-    padding: 0 8px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--dim);
+  }
+  .foot .text-link {
+    font-size: 12px;
+  }
+  @media (max-width: 900px) {
+    .topbar :global(.collapse) {
+      display: none;
+    }
   }
 </style>

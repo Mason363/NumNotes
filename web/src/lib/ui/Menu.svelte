@@ -42,15 +42,15 @@
   }
   .menu {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 4px);
     z-index: 50;
-    min-width: 230px;
+    min-width: 220px;
     background: var(--panel);
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
-    padding: 6px;
+    padding: 4px 0;
     display: grid;
-    gap: 1px;
   }
   .left {
     left: 0;
@@ -64,38 +64,34 @@
     gap: 10px;
     width: 100%;
     border: none;
-    border-radius: var(--radius-sm);
     background: transparent;
-    padding: 7px 10px;
+    padding: 7px 14px;
     text-align: left;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
     color: var(--text);
   }
   .menu :global(.item:hover) {
     background: var(--hover);
   }
   .menu :global(.item svg) {
-    width: 16px;
-    height: 16px;
-    color: var(--purple);
+    width: 18px;
+    height: 18px;
+    color: var(--dim);
     flex: none;
   }
   .menu :global(.item .desc) {
     display: block;
     font-size: 12px;
-    font-weight: 400;
     color: var(--dim);
   }
   .menu :global(.sep) {
     height: 1px;
     background: var(--line);
-    margin: 4px 6px;
+    margin: 4px 0;
   }
   .menu :global(.menu-label) {
-    padding: 6px 10px 2px;
-    font-size: 11px;
-    font-weight: 700;
+    padding: 6px 14px 2px;
+    font-size: 12px;
     color: var(--dim);
   }
 </style>

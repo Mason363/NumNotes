@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { Plus } from '@lucide/svelte';
+  import { Plus, Settings, SlidersHorizontal } from '@lucide/svelte';
   import { MODE_INFO, SECTION_ICONS } from '../icons.ts';
   import Button from '../ui/Button.svelte';
+  import Popover from '../ui/Popover.svelte';
+  import ItemPanel from './inspector/ItemPanel.svelte';
+  import SectionPanel from './inspector/SectionPanel.svelte';
   import { newSection } from '../state/defaults.ts';
   import { store } from '../state/project.svelte.ts';
   import CanvasEditor from './editors/CanvasEditor.svelte';
@@ -11,6 +14,22 @@
   import SlidesEditor from './editors/SlidesEditor.svelte';
 
   const section = $derived(store.section);
+  let settingsOpen = $state(false);
+  let itemOpen = $state(false);
+
+  // What's selected, for the options button.
+  const itemLabel = $derived.by(() => {
+    if (store.focusPicture) return 'Picture';
+    const ids = store.selection.items;
+    if (!ids.length) return null;
+    if (section?.mode === 'gallery') return 'Picture';
+    const items = store.selectedItems;
+    if (items.length !== 1) return items.length ? `${items.length} items` : null;
+    return items[0].type === 'image' ? 'Picture' : items[0].type === 'text' ? 'Text' : 'Shape';
+  });
+  $effect(() => {
+    if (!itemLabel) itemOpen = false;
+  });
 
   function addFirst() {
     const s = newSection('document', 'Notes', 0);
@@ -40,6 +59,20 @@
         }}
       />
       <span class="mode">{MODE_INFO[section.mode].label}</span>
+      {#if itemLabel}
+        <Popover open={itemOpen} title="{itemLabel} options" onclose={() => (itemOpen = false)}>
+          {#snippet trigger()}
+            <Button size="sm" class="item-btn" onclick={() => (itemOpen = !itemOpen)}><SlidersHorizontal />{itemLabel} options</Button>
+          {/snippet}
+          <ItemPanel />
+        </Popover>
+      {/if}
+      <Popover open={settingsOpen} title="Section settings" onclose={() => (settingsOpen = false)}>
+        {#snippet trigger()}
+          <Button size="sm" onclick={() => (settingsOpen = !settingsOpen)}><Settings />Settings</Button>
+        {/snippet}
+        <SectionPanel />
+      </Popover>
     </header>
     <div class="body">
       {#key section.id}
@@ -75,16 +108,17 @@
   header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 0 16px 0 12px;
-    height: 52px;
-    border-bottom: 1px solid var(--line);
+    gap: 8px;
+    padding: 0 10px 0 12px;
+    height: 46px;
+    border-bottom: 1px solid var(--line-strong);
+    background: var(--panel);
     flex: none;
   }
   .icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 7px;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
     display: grid;
     place-items: center;
     flex: none;
@@ -95,26 +129,29 @@
     border: 1px solid transparent;
     background: transparent;
     font-size: 16px;
-    font-weight: 700;
-    padding: 4px 8px;
+    padding: 4px 6px;
     border-radius: var(--radius-sm);
     color: var(--text);
   }
   .title:hover {
-    background: var(--layout);
+    border-color: var(--line);
   }
   .title:focus {
-    background: var(--panel);
-    border-color: var(--purple);
+    border-color: var(--blue);
     outline: none;
   }
   .mode {
     font-size: 12px;
-    font-weight: 700;
-    color: var(--purple);
-    background: var(--purple-soft);
-    padding: 3px 10px;
-    border-radius: var(--pill);
+    color: var(--dim);
+    margin-right: 4px;
+  }
+  header :global(.item-btn) {
+    background: var(--accent-soft);
+    border-color: rgba(245, 165, 28, 0.5);
+  }
+  header :global(.btn svg) {
+    width: 15px;
+    height: 15px;
   }
   .body {
     flex: 1;
@@ -131,7 +168,12 @@
     padding: 40px;
   }
   .empty h2 {
-    font-size: 28px;
-    font-weight: 300;
+    font-size: 22px;
+    font-weight: 400;
+  }
+  @media (max-width: 640px) {
+    .mode {
+      display: none;
+    }
   }
 </style>

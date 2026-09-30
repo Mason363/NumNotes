@@ -38,7 +38,7 @@ import {
   rgb565,
   writeBundle,
 } from './format.ts';
-import { DEFAULT_QUALITY, encodeAnimation, encodeImage, levelSizes, renderSource } from './images.ts';
+import { DEFAULT_QUALITY, SHRINK_STEPS, encodeAnimation, encodeImage, levelSizes, renderSource, shrinkQuality } from './images.ts';
 import { LayoutContext, type MathSource, type PictureRequest, type PictureResult, type PictureSource, SceneBuilder, type ThemeColors } from './layout/context.ts';
 import { layoutGallery, layoutItems, slideHeading } from './layout/frame.ts';
 import { Flow } from './layout/rich.ts';
@@ -53,6 +53,8 @@ export interface BuildOptions {
   onProgress?: (fraction: number, label: string) => void;
   signal?: AbortSignal;
   math?: MathSource;
+  /** Extra compression for every picture (0..3), used to make the app fit. */
+  shrink?: number;
 }
 
 export interface SectionUsage {
@@ -146,6 +148,8 @@ class PictureRegistry implements PictureSource {
   images = 0;
   anims = 0;
   section = 0;
+  /** Compression for pictures requested from now on. */
+  shrink = 0;
   private assets: AssetProvider;
 
   constructor(assets: AssetProvider) {
@@ -160,6 +164,7 @@ class PictureRegistry implements PictureSource {
   request(req: PictureRequest): PictureResult | undefined {
     const meta = this.assets.meta(req.ref.asset);
     if (!meta) return undefined;
+    if (this.shrink && !meta.id.startsWith('math:')) req = { ...req, shrink: this.shrink };
     const kind = meta.kind === 'animation' ? 'anim' : 'image';
     const key = pictureKey(req, kind);
     let p = this.byKey.get(key);
@@ -188,6 +193,7 @@ function pictureKey(req: PictureRequest, kind: string): string {
     !!req.keepAlpha,
     !!req.noDetail,
     !!req.zoomOut,
+    req.shrink ?? 0,
   ]);
 }
 
@@ -201,7 +207,12 @@ async function encodePicture(p: Pending, assets: AssetProvider, warnings: string
   const cached = encodeCache.get(p.key);
   if (cached) return cached;
   const meta = assets.meta(p.req.ref.asset)!;
-  const q: ImageQuality = { ...DEFAULT_QUALITY, ...p.req.ref.quality };
+  const shrink = p.req.shrink ?? 0;
+  const q: ImageQuality = shrinkQuality({ ...DEFAULT_QUALITY, ...p.req.ref.quality }, shrink);
+  // Stronger steps also store fewer pixels; the calculator scales them up.
+  const scale = SHRINK_STEPS[Math.min(shrink, SHRINK_STEPS.length - 1)].scale;
+  const w = Math.max(1, Math.round(p.req.w * scale));
+  const h = Math.max(1, Math.round(p.req.h * scale));
   const crop = p.req.cover ?? p.req.ref.crop;
   const opts = {
     crop,
@@ -212,7 +223,7 @@ async function encodePicture(p: Pending, assets: AssetProvider, warnings: string
   try {
     if (p.kind === 'anim') {
       const frames = (await assets.frames(meta.id)).slice(0, 150);
-      const rendered = frames.map((f) => renderSource(f.bitmap, p.req.w, p.req.h, { ...opts, background: p.req.background }));
+      const rendered = frames.map((f) => renderSource(f.bitmap, w, h, { ...opts, background: p.req.background }));
       const entry: Encoded = { frames: encodeAnimation(rendered, q), delays: frames.map((f) => f.delayMs) };
       remember(p.key, entry);
       return entry;
@@ -220,12 +231,12 @@ async function encodePicture(p: Pending, assets: AssetProvider, warnings: string
     const bitmap = await assets.bitmap(meta.id);
     const srcW = meta.width * (crop?.w ?? 1);
     const srcH = meta.height * (crop?.h ?? 1);
-    const sizes = p.req.noDetail ? [{ w: Math.round(p.req.w), h: Math.round(p.req.h) }] : levelSizes(p.req.w, p.req.h, srcW, srcH, q.zoomDetail);
-    if (p.req.zoomOut && p.req.w >= 96 && p.req.h >= 64) {
-      sizes.unshift({ w: Math.round(p.req.w / 2), h: Math.round(p.req.h / 2) });
+    const sizes = p.req.noDetail ? [{ w, h }] : levelSizes(w, h, srcW, srcH, q.zoomDetail);
+    if (p.req.zoomOut && w >= 96 && h >= 64) {
+      sizes.unshift({ w: Math.round(w / 2), h: Math.round(h / 2) });
     }
     const levels = sizes.map((s) => renderSource(bitmap, s.w, s.h, opts));
-    const entry: Encoded = { image: encodeImage(levels, q, !!p.req.keepAlpha) };
+    const entry: Encoded = { image: encodeImage(levels, q, !!p.req.keepAlpha, shrink) };
     remember(p.key, entry);
     return entry;
   } catch (e) {
@@ -400,6 +411,7 @@ export async function buildBundle(project: Project, assets: AssetProvider, opts:
   const notes: string[] = [];
   project.sections.forEach((section, i) => {
     pictures.section = i;
+    pictures.shrink = Math.min(3, Math.max(opts.shrink ?? 0, section.shrink ?? 0));
     const first = scenes.length;
     const laid = sectionScenes(section, ctx, theme, project);
     scenes.push(...laid.scenes);

@@ -203,14 +203,14 @@
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: rgba(122, 129, 255, 0.14);
+    background: rgba(247, 249, 250, 0.7);
     display: grid;
     place-items: center;
     pointer-events: none;
     padding: 24px;
   }
   .target {
-    border: 2px dashed var(--purple);
+    border: 2px dashed var(--accent);
     border-radius: var(--radius-lg);
     background: var(--panel);
     box-shadow: var(--shadow-lg);
@@ -220,9 +220,9 @@
     text-align: center;
   }
   .target strong {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--purple);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
   }
   .choices {
     display: grid;
@@ -244,7 +244,7 @@
   }
   .choice.on {
     border-color: var(--accent);
-    background: var(--panel);
+    background: var(--accent-soft);
   }
   .dot {
     width: 16px;

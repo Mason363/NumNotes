@@ -16,31 +16,27 @@
 </button>
 
 <style>
-  /* Round icon buttons, like the Board's help and card controls. */
   .icon-btn {
     display: inline-grid;
     place-items: center;
-    border: 1px solid transparent;
-    border-radius: 50%;
+    border: none;
+    border-radius: var(--radius-sm);
     background: transparent;
-    color: var(--label);
-    transition: background-color 0.12s, color 0.12s;
+    color: var(--text);
   }
   .md {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
   }
   .sm {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
   .icon-btn:hover:not(:disabled) {
     background: var(--hover);
-    color: var(--text);
   }
   .icon-btn.active {
-    background: var(--purple-soft);
-    color: var(--purple);
+    background: var(--select);
   }
   .icon-btn:disabled {
     opacity: 0.3;
@@ -51,7 +47,7 @@
     height: 18px;
   }
   .sm :global(svg) {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 </style>

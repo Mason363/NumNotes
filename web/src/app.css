@@ -1,89 +1,47 @@
-/* NumWorks look: Manrope, lavender layout, soft blue cards, yellow for
- * primary actions and selection, purple for links. */
+/* Light and calm, like Desmos, on the calculator's own background color
+ * (Epsilon's WallScreen, #F7F9FA). NumWorks yellow marks the main action and
+ * the current selection. */
 :root {
-  --bg: #f5f6ff;
-  --layout: #f5f6ff;
+  --bg: #f7f9fa;
+  --layout: #f7f9fa;
   --panel: #ffffff;
-  --panel-2: #f5f6ff;
-  --card: #dde5ff;
-  --card-hover: #d3dcff;
+  --panel-2: #f7f9fa;
+  --card: #f7f9fa;
+  --card-hover: #eef1f3;
   --field: #ffffff;
-  --hover: #eef1ff;
-  --line: #e3e7f6;
-  --line-strong: #c9d1ea;
-  --text: #262626;
-  --label: #4a5565;
-  --dim: #6a7282;
-  --faint: #9aa1b0;
+  --hover: #f0f2f4;
+  --tab: #ececec;
+  --line: rgba(0, 0, 0, 0.12);
+  --line-strong: rgba(0, 0, 0, 0.22);
+  --text: #1f1f1f;
+  --label: #3c3f47;
+  --dim: #656975;
+  --faint: #a7a7a7;
   --accent: #ffb734;
-  --accent-strong: #f5a61c;
-  --accent-soft: #fff3dc;
-  --accent-text: #b67800;
+  --accent-strong: #f5a51c;
+  --accent-soft: #fff4de;
+  --accent-text: #9a6400;
   --on-accent: #ffffff;
-  --purple: #7a81ff;
-  --purple-strong: #6168f2;
-  --purple-soft: #eceeff;
+  --blue: #3b6fd8;
+  --purple: #3b6fd8;
+  --purple-strong: #2f5fc4;
+  --purple-soft: #e8eefb;
+  --select: #d4d7e0;
+  --btn: #ededed;
+  --btn-hover: #e2e2e2;
   --grey-btn: #656975;
-  --danger: #e5484d;
-  --ok: #2fa84f;
-  --focus: 0 0 0 2px var(--purple);
-  --shadow: 0 1px 2px rgba(38, 44, 80, 0.08);
-  --shadow-lg: 0 12px 32px rgba(38, 44, 80, 0.18);
-  --radius-lg: 12px;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --pill: 20px;
-  --font: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --danger: #d8352a;
+  --ok: #2f9e44;
+  --focus: 0 0 0 2px rgba(59, 111, 216, 0.5);
+  --shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
+  --radius-lg: 6px;
+  --radius: 5px;
+  --radius-sm: 4px;
+  --pill: 4px;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: #15161d;
-    --layout: #15161d;
-    --panel: #1f2029;
-    --panel-2: #15161d;
-    --card: #2a2d40;
-    --card-hover: #33374d;
-    --field: #1f2029;
-    --hover: #282a38;
-    --line: #2e3142;
-    --line-strong: #3d4157;
-    --text: #eceef4;
-    --label: #b9bfcc;
-    --dim: #9199aa;
-    --faint: #6b7283;
-    --accent-soft: #3a2d12;
-    --accent-text: #ffc55c;
-    --purple-soft: #2b2d4f;
-    --grey-btn: #aeb3c0;
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme='dark'] {
-  --bg: #15161d;
-  --layout: #15161d;
-  --panel: #1f2029;
-  --panel-2: #15161d;
-  --card: #2a2d40;
-  --card-hover: #33374d;
-  --field: #1f2029;
-  --hover: #282a38;
-  --line: #2e3142;
-  --line-strong: #3d4157;
-  --text: #eceef4;
-  --label: #b9bfcc;
-  --dim: #9199aa;
-  --faint: #6b7283;
-  --accent-soft: #3a2d12;
-  --accent-text: #ffc55c;
-  --purple-soft: #2b2d4f;
-  --grey-btn: #aeb3c0;
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
-  color-scheme: dark;
 }
 
 * {
@@ -96,7 +54,7 @@ body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.45 var(--font);
+  font: 14px/1.4 var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -126,7 +84,7 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 p {
@@ -134,8 +92,7 @@ p {
 }
 
 a {
-  color: var(--purple);
-  font-weight: 700;
+  color: var(--blue);
   text-decoration: none;
 }
 
@@ -151,69 +108,66 @@ a:hover {
   font-size: 12px;
 }
 
-/* Panel headings, like the Board's "Deck" and "Settings". */
 .panel-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
 }
 
-/* Group headings inside a panel. */
 .group-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--label);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* Small bold labels. */
 .label-caps {
   font-size: 12px;
-  font-weight: 700;
-  color: var(--label);
+  font-weight: 600;
+  color: var(--dim);
 }
 
-/* Text fields and selects: white, soft corners, no border. */
+/* Text fields and selects. */
 .field-input {
   width: 100%;
   height: 32px;
-  border: 1px solid transparent;
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  padding: 0 10px;
+  padding: 0 8px;
   background: var(--field);
-  color: var(--label);
-  font-size: 12px;
+  color: var(--text);
+  font-size: 13px;
 }
 
 .field-input:hover {
-  border-color: var(--line-strong);
+  border-color: rgba(0, 0, 0, 0.35);
 }
 
 .field-input:focus {
   outline: none;
-  border-color: var(--purple);
+  border-color: var(--blue);
+  box-shadow: var(--focus);
 }
 
 select.field-input {
   appearance: none;
-  padding-right: 28px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%234a5565'/%3E%3C/svg%3E");
+  padding-right: 26px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23656975'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 9px center;
   cursor: pointer;
 }
 
-/* A plain purple text action, like the Board's "Templates". */
 .text-link {
   border: none;
   background: transparent;
   padding: 0;
-  color: var(--purple);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--blue);
+  font-size: 13px;
 }
 
 .text-link:hover {
-  color: var(--purple-strong);
   text-decoration: underline;
 }
 
@@ -228,7 +182,7 @@ select.field-input {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
 ::selection {
