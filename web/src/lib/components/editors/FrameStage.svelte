@@ -4,6 +4,7 @@
   import { richExtensions } from '../../doc/extensions.ts';
   import RichEditor from '../../doc/RichEditor.svelte';
   import { assets } from '../../state/assets.ts';
+  import PictureView from '../PictureView.svelte';
 
   interface Props {
     items: Item[];
@@ -29,7 +30,7 @@
     scale,
     background,
     textColor,
-    accent = '#f28c28',
+    accent = '#ffb734',
     fontSize = 13,
     selected = [],
     readonly = false,
@@ -61,23 +62,6 @@
     return out;
   }
 
-  function filter(item: Item): string {
-    if (item.type !== 'image') return '';
-    const a = item.adjust;
-    const f = [];
-    if (a.brightness) f.push(`brightness(${100 + a.brightness}%)`);
-    if (a.contrast) f.push(`contrast(${100 + a.contrast}%)`);
-    if (a.saturation) f.push(`saturate(${100 + a.saturation}%)`);
-    if (a.grayscale) f.push('grayscale(1)');
-    if (a.invert) f.push('invert(1)');
-    return f.join(' ');
-  }
-
-  function transform(item: Item): string {
-    if (item.type !== 'image') return '';
-    const a = item.adjust;
-    return `rotate(${a.rotate}deg) scale(${a.flipX ? -1 : 1}, ${a.flipY ? -1 : 1})`;
-  }
 
   // ---- Dragging ----
 
@@ -279,7 +263,7 @@
         {@const url = assets.url(item.asset)}
         <div class="img-wrap" style="border-radius: {item.radius * scale}px; {item.border ? `box-shadow: inset 0 0 0 ${item.border.width * scale}px ${item.border.color}` : ''}">
           {#if url}
-            <img src={url} alt={item.caption ?? ''} draggable="false" style="object-fit: {item.fit === 'fill' ? 'fill' : item.fit}; filter: {filter(item)}; transform: {transform(item)}" />
+            <PictureView asset={item.asset} crop={item.crop} adjust={item.adjust} fit={item.fit} alt={item.caption ?? ''} />
           {:else}
             <span class="missing">Missing picture</span>
           {/if}
@@ -400,11 +384,6 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-  }
-  .img-wrap img {
-    width: 100%;
-    height: 100%;
-    display: block;
   }
   .missing {
     display: grid;

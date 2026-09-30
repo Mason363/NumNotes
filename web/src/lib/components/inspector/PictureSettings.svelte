@@ -1,24 +1,33 @@
 <script lang="ts">
   import { ChevronRight, FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw } from '@lucide/svelte';
-  import type { ImageAdjust, ImageQuality } from '../../../model/types.ts';
+  import type { Crop, ImageAdjust, ImageQuality } from '../../../model/types.ts';
   import { DEFAULT_ADJUST, DEFAULT_QUALITY } from '../../../pack/images.ts';
+  import Button from '../../ui/Button.svelte';
   import Field from '../../ui/Field.svelte';
   import IconButton from '../../ui/IconButton.svelte';
   import Segmented from '../../ui/Segmented.svelte';
   import Slider from '../../ui/Slider.svelte';
   import Toggle from '../../ui/Toggle.svelte';
+  import CropDialog from '../CropDialog.svelte';
+
+  type PicturePatch = { adjust?: ImageAdjust; quality?: ImageQuality; crop?: Crop };
 
   interface Props {
+    asset?: string;
+    crop?: Crop;
     adjust?: ImageAdjust;
     quality?: ImageQuality;
-    onchange: (patch: { adjust?: ImageAdjust; quality?: ImageQuality }, key: string) => void;
+    onchange: (patch: PicturePatch, key: string) => void;
   }
-  let { adjust, quality, onchange }: Props = $props();
+  let { asset, crop, adjust, quality, onchange }: Props = $props();
+  let cropOpen = $state(false);
   const a = $derived({ ...DEFAULT_ADJUST, ...adjust });
   const q = $derived({ ...DEFAULT_QUALITY, ...quality });
   let showAdjust = $state(false);
 
   const setA = (patch: Partial<ImageAdjust>, key = 'adjust') => onchange({ adjust: { ...a, ...patch } }, key);
+  // Crops are drawn on the turned picture, so turning starts over.
+  const turn = (patch: Partial<ImageAdjust>) => onchange({ adjust: { ...a, ...patch }, crop: undefined }, 'turn');
   const setQ = (patch: Partial<ImageQuality>, key = 'quality') => onchange({ quality: { ...q, ...patch } }, key);
 
   const MODES: Record<ImageQuality['mode'], string> = {
@@ -30,6 +39,12 @@
 </script>
 
 <div class="picture-settings">
+  {#if asset}
+    <div class="crop-row">
+      <Button size="sm" onclick={() => (cropOpen = true)}>Crop</Button>
+      {#if crop}<button class="text-link" onclick={() => onchange({ crop: undefined }, 'crop')}>Remove crop</button>{/if}
+    </div>
+  {/if}
   <Field label="Quality" hint={MODES[q.mode]}>
     <Segmented
       value={q.mode}
@@ -84,10 +99,10 @@
   {#if showAdjust}
     <div class="adjust">
       <div class="orient">
-        <IconButton size="sm" label="Rotate left" onclick={() => setA({ rotate: ((a.rotate + 270) % 360) as ImageAdjust['rotate'] })}><RotateCcw /></IconButton>
-        <IconButton size="sm" label="Rotate right" onclick={() => setA({ rotate: ((a.rotate + 90) % 360) as ImageAdjust['rotate'] })}><RotateCw /></IconButton>
-        <IconButton size="sm" label="Flip horizontally" active={a.flipX} onclick={() => setA({ flipX: !a.flipX })}><FlipHorizontal2 /></IconButton>
-        <IconButton size="sm" label="Flip vertically" active={a.flipY} onclick={() => setA({ flipY: !a.flipY })}><FlipVertical2 /></IconButton>
+        <IconButton size="sm" label="Rotate left" onclick={() => turn({ rotate: ((a.rotate + 270) % 360) as ImageAdjust['rotate'] })}><RotateCcw /></IconButton>
+        <IconButton size="sm" label="Rotate right" onclick={() => turn({ rotate: ((a.rotate + 90) % 360) as ImageAdjust['rotate'] })}><RotateCw /></IconButton>
+        <IconButton size="sm" label="Flip horizontally" active={a.flipX} onclick={() => turn({ flipX: !a.flipX })}><FlipHorizontal2 /></IconButton>
+        <IconButton size="sm" label="Flip vertically" active={a.flipY} onclick={() => turn({ flipY: !a.flipY })}><FlipVertical2 /></IconButton>
       </div>
       <Field label="Brightness"><Slider value={a.brightness} min={-60} max={60} oninput={(brightness) => setA({ brightness }, 'brightness')} /></Field>
       <Field label="Contrast"><Slider value={a.contrast} min={-60} max={80} oninput={(contrast) => setA({ contrast }, 'contrast')} /></Field>
@@ -100,6 +115,10 @@
   {/if}
 </div>
 
+{#if asset}
+  <CropDialog open={cropOpen} {asset} {crop} adjust={a} onapply={(c) => onchange({ crop: c }, 'crop')} onclose={() => (cropOpen = false)} />
+{/if}
+
 <style>
   .picture-settings,
   .adjust {
@@ -109,6 +128,11 @@
   .orient {
     display: flex;
     gap: 4px;
+  }
+  .crop-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   .orient :global(.icon-btn) {
     background: var(--field);

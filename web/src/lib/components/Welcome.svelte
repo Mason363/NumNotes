@@ -91,6 +91,7 @@
     <footer>
       <p class="muted small">
         For the NumWorks N0110, N0115 and N0120. Your files stay in this browser.
+        NumNotes is an independent project, not made by NumWorks.
         {#if !supported}To send apps straight to the calculator, use Chrome or Edge. Other browsers can download the app file.{/if}
       </p>
     </footer>

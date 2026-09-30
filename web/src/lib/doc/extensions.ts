@@ -23,6 +23,10 @@ export const Picture = Node.create({
       width: { default: 100 },
       align: { default: 'center' },
       caption: { default: '' },
+      // Picture settings travel with the node but stay out of the HTML.
+      adjust: { default: null, rendered: false },
+      quality: { default: null, rendered: false },
+      crop: { default: null, rendered: false },
     };
   },
 
@@ -54,7 +58,12 @@ export const Picture = Node.create({
       figure.className = 'nn-picture';
       figure.dataset.align = node.attrs.align;
       const img = document.createElement('img');
-      img.src = assets.url(node.attrs.asset) ?? '';
+      const { crop, adjust } = node.attrs;
+      if (crop || adjust?.rotate || adjust?.flipX || adjust?.flipY) {
+        assets.preview(node.attrs.asset, crop ?? undefined, adjust ?? undefined).then((url) => (img.src = url), () => {});
+      } else {
+        img.src = assets.url(node.attrs.asset) ?? '';
+      }
       img.style.width = `${node.attrs.width}%`;
       img.draggable = false;
       figure.append(img);

@@ -55,7 +55,16 @@
     <TopBar />
     <div class="body">
       <aside class="col left">
-        <div class="sections"><Sidebar /></div>
+        <!-- On phones, picking a section opens it. -->
+        <div
+          class="sections"
+          role="presentation"
+          onclick={(e) => {
+            if (mobileTab === 'sections' && (e.target as HTMLElement).closest('[role="option"]')) mobileTab = 'edit';
+          }}
+        >
+          <Sidebar />
+        </div>
         <div class="settings"><Inspector /></div>
       </aside>
       <main class="col edit"><SectionEditor /></main>

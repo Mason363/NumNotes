@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PictureView from '../PictureView.svelte';
   import type { GallerySection } from '../../../model/types.ts';
   import { assets } from '../../state/assets.ts';
   import { store } from '../../state/project.svelte.ts';
@@ -55,7 +56,7 @@
         >
           <button class="thumb" onclick={() => store.select({ items: [img.id] })} aria-label="Select picture {i + 1}">
             {#if assets.url(img.asset)}
-              <img src={assets.url(img.asset)} alt={img.caption ?? ''} style="filter: {img.adjust.grayscale ? 'grayscale(1)' : ''}" />
+              <PictureView asset={img.asset} crop={img.crop} adjust={img.adjust} fit="cover" alt={img.caption ?? ''} />
             {/if}
           </button>
           <input
@@ -116,10 +117,9 @@
   .selected .thumb {
     border-color: var(--accent);
   }
-  .thumb img {
+  .thumb :global(img) {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     display: block;
   }
   .caption {

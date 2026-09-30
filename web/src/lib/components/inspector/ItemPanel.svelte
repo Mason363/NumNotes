@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ImageAdjust, ImageItem, ImageQuality, Item, ShapeItem, TextItem } from '../../../model/types.ts';
+  import type { Crop, ImageAdjust, ImageItem, ImageQuality, Item, ShapeItem, TextItem } from '../../../model/types.ts';
   import { FAMILY_LABELS } from '../../../pack/fonts.ts';
   import ColorInput from '../../ui/ColorInput.svelte';
   import Field from '../../ui/Field.svelte';
@@ -20,7 +20,7 @@
 
   const set = (patch: Partial<Item>, key = 'item') => item && updateItem(item.id, patch, `${key}:${item.id}`);
 
-  function setGallery(patch: { adjust?: ImageAdjust; quality?: ImageQuality; caption?: string }, key: string) {
+  function setGallery(patch: { adjust?: ImageAdjust; quality?: ImageQuality; caption?: string; crop?: Crop }, key: string) {
     const id = galleryImage?.id;
     const sid = section?.id;
     store.edit((p) => {
@@ -57,16 +57,18 @@
       <input class="field-input" value={String(picture.attrs.caption ?? '')} oninput={(e) => picture.apply({ caption: (e.currentTarget as HTMLInputElement).value })} />
     </Field>
     <PictureSettings
-      adjust={picture.attrs.adjust as ImageAdjust | undefined}
-      quality={picture.attrs.quality as ImageQuality | undefined}
-      onchange={(patch) => picture.apply(patch)}
+      asset={String(picture.attrs.asset)}
+      crop={(picture.attrs.crop ?? undefined) as Crop | undefined}
+      adjust={(picture.attrs.adjust ?? undefined) as ImageAdjust | undefined}
+      quality={(picture.attrs.quality ?? undefined) as ImageQuality | undefined}
+      onchange={(patch) => picture.apply('crop' in patch ? { ...patch, crop: patch.crop ?? null } : patch)}
     />
   {:else if galleryImage}
     <h3 class="group-title">Picture</h3>
     <Field label="Caption">
       <input class="field-input" value={galleryImage.caption ?? ''} oninput={(e) => setGallery({ caption: (e.currentTarget as HTMLInputElement).value }, 'caption')} />
     </Field>
-    <PictureSettings adjust={galleryImage.adjust} quality={galleryImage.quality} onchange={setGallery} />
+    <PictureSettings asset={galleryImage.asset} crop={galleryImage.crop} adjust={galleryImage.adjust} quality={galleryImage.quality} onchange={setGallery} />
   {:else if item}
     <h3 class="group-title">{item.type === 'image' ? 'Picture' : item.type === 'text' ? 'Text box' : 'Shape'}</h3>
     <div class="grid4">
@@ -94,7 +96,7 @@
       <Field label="Caption">
         <input class="field-input" value={img.caption ?? ''} oninput={(e) => set({ caption: (e.currentTarget as HTMLInputElement).value } as Partial<Item>, 'caption')} />
       </Field>
-      <PictureSettings adjust={img.adjust} quality={img.quality} onchange={(patch, key) => set(patch as Partial<Item>, key)} />
+      <PictureSettings asset={img.asset} crop={img.crop} adjust={img.adjust} quality={img.quality} onchange={(patch, key) => set(patch as Partial<Item>, key)} />
     {:else if item.type === 'text'}
       {@const t = item as TextItem}
       <Field label="Background"><ColorInput value={t.background} allowNone onchange={(background) => set({ background } as Partial<Item>)} /></Field>

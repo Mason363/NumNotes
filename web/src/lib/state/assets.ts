@@ -2,8 +2,9 @@
 // are cached in memory for the editor and the bundle builder.
 
 import type { Imported } from '../../import/index.ts';
-import type { AssetMeta } from '../../model/types.ts';
+import type { AssetMeta, Crop, ImageAdjust } from '../../model/types.ts';
 import type { AssetProvider } from '../../pack/build.ts';
+import { DEFAULT_ADJUST, renderSource } from '../../pack/images.ts';
 import { db, type StoredAsset } from './db.ts';
 
 const WEB_SAFE = /^image\/(jpeg|png|webp|gif|avif|bmp)$/;
@@ -25,6 +26,7 @@ export class AssetStore implements AssetProvider {
   private bitmaps = new Map<string, Promise<ImageBitmap>>();
   private frameCache = new Map<string, Promise<{ bitmap: ImageBitmap; delayMs: number }[]>>();
   private urls = new Map<string, string>();
+  private previews = new Map<string, Promise<string>>();
   /** Bumped whenever the set of assets changes (for reactive UIs). */
   version = 0;
   onChange?: () => void;
@@ -164,6 +166,33 @@ export class AssetStore implements AssetProvider {
       this.urls.set(id, url);
     }
     return url;
+  }
+
+  /** Object URL of the picture turned and cropped as it will appear, at
+   * most `max` pixels on its long side. */
+  preview(id: string, crop?: Crop, adjust?: Partial<ImageAdjust>, max = 1200): Promise<string> {
+    const orient = { rotate: adjust?.rotate ?? 0, flipX: !!adjust?.flipX, flipY: !!adjust?.flipY };
+    const key = JSON.stringify([id, crop ?? null, orient, max]);
+    let p = this.previews.get(key);
+    if (!p) {
+      p = (async () => {
+        const bitmap = await this.bitmap(id);
+        const turned = orient.rotate === 90 || orient.rotate === 270;
+        const c = crop ?? { x: 0, y: 0, w: 1, h: 1 };
+        const sw = (turned ? bitmap.height : bitmap.width) * c.w;
+        const sh = (turned ? bitmap.width : bitmap.height) * c.h;
+        const s = Math.min(1, max / Math.max(sw, sh));
+        const w = Math.max(1, Math.round(sw * s));
+        const h = Math.max(1, Math.round(sh * s));
+        const data = renderSource(bitmap, w, h, { crop, adjust: { ...DEFAULT_ADJUST, ...orient } });
+        const canvas = new OffscreenCanvas(w, h);
+        canvas.getContext('2d')!.putImageData(data, 0, 0);
+        return URL.createObjectURL(await canvas.convertToBlob({ type: 'image/png' }));
+      })();
+      p.catch(() => this.previews.delete(key));
+      this.previews.set(key, p);
+    }
+    return p;
   }
 
   blob(id: string): Blob | undefined {
