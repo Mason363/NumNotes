@@ -42,7 +42,7 @@
   - **Canvas**, one big board you pan and zoom.
   - **Gallery**, a grid of pictures that open full screen.
   - **Notes**, a notebook you type into on the calculator.
-- **Real color.** Charts, diagrams and photos keep their colors and stay sharp, with extra detail for zooming in.
+- **Real color.** Charts, diagrams and photos keep their colors and stay sharp, with extra detail for zooming in. Crop, rotate and tune any picture.
 - **Installs itself.** Plug the calculator in and press Send. Your other apps stay where they are. Or download the `.nwa` and add it at [my.numworks.com/apps](https://my.numworks.com/apps).
 - **Type on the calculator.** Write notes with the keyboard. They stay on the calculator, even when you send an updated version.
 - **Find things fast.** Search everything, bookmark spots, jump to a page, open a table of contents.
