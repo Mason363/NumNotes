@@ -461,7 +461,7 @@
     margin-bottom: 0;
   }
   .static :global(mark) {
-    color: inherit;
+    color: #1f1f1f;
     border-radius: 2px;
   }
   .shape {

@@ -212,7 +212,7 @@
   .page :global(mark) {
     border-radius: 3px;
     padding: 0 1px;
-    color: inherit;
+    color: #1f1f1f;
   }
   .page :global(table) {
     border-collapse: collapse;

@@ -7,6 +7,7 @@ import { TextAlign } from '@tiptap/extension-text-align';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import { Placeholder } from '@tiptap/extensions';
 import StarterKit from '@tiptap/starter-kit';
+import { colorLuminance } from '../../pack/contrast.ts';
 import { assets } from '../state/assets.ts';
 
 /** A picture from the asset store, laid out as a block. */
@@ -160,8 +161,14 @@ const cellColor = {
   backgroundColor: {
     default: null,
     parseHTML: (el: HTMLElement) => el.style.backgroundColor || el.dataset.background || null,
-    renderHTML: (attrs: Record<string, unknown>) =>
-      attrs.backgroundColor ? { style: `background-color: ${attrs.backgroundColor}` } : {},
+    renderHTML: (attrs: Record<string, unknown>) => {
+      const bg = attrs.backgroundColor as string | null;
+      if (!bg) return {};
+      // Keep the text readable in any theme, as on the calculator.
+      const lum = colorLuminance(bg);
+      const text = lum === null ? '' : `; color: ${lum > 0.18 ? '#1f1f1f' : '#ffffff'}`;
+      return { style: `background-color: ${bg}${text}` };
+    },
   },
 };
 

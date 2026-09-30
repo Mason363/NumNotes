@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { follow, place, placementStyle, type Placement } from './place.ts';
 
   interface Props {
     open: boolean;
@@ -10,11 +11,21 @@
   }
   let { open, align = 'left', onclose, children, trigger }: Props = $props();
   let root: HTMLElement | undefined = $state();
+  let menu: HTMLElement | undefined = $state();
+  let pos = $state<Placement | null>(null);
 
   $effect(() => {
-    if (!open) return;
+    if (!open) {
+      pos = null;
+      return;
+    }
+    const stop = follow(() => {
+      if (root) pos = place(root.getBoundingClientRect(), { align, gap: 4 });
+    });
     const onDown = (e: PointerEvent) => {
-      if (root && !root.contains(e.target as Node)) onclose();
+      const t = e.target as Node;
+      if (root?.contains(t) || menu?.contains(t)) return;
+      onclose();
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onclose();
@@ -22,6 +33,7 @@
     window.addEventListener('pointerdown', onDown, true);
     window.addEventListener('keydown', onKey);
     return () => {
+      stop();
       window.removeEventListener('pointerdown', onDown, true);
       window.removeEventListener('keydown', onKey);
     };
@@ -31,7 +43,7 @@
 <div class="menu-root" bind:this={root}>
   {@render trigger()}
   {#if open}
-    <div class="menu {align}" role="menu">{@render children()}</div>
+    <div class="menu" role="menu" bind:this={menu} style={placementStyle(pos)}>{@render children()}</div>
   {/if}
 </div>
 
@@ -41,9 +53,9 @@
     display: inline-flex;
   }
   .menu {
-    position: absolute;
-    top: calc(100% + 4px);
-    z-index: 50;
+    position: fixed;
+    z-index: 70;
+    overflow: auto;
     min-width: 220px;
     background: var(--panel);
     border: 1px solid var(--line-strong);
@@ -51,12 +63,6 @@
     box-shadow: var(--shadow-lg);
     padding: 4px 0;
     display: grid;
-  }
-  .left {
-    left: 0;
-  }
-  .right {
-    right: 0;
   }
   .menu :global(.item) {
     display: flex;

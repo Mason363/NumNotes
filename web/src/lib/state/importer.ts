@@ -123,6 +123,7 @@ export async function addImports(
   onProgress?.(1, 'Done');
 
   let target: Section | undefined;
+  let firstNewSlide: string | null = null;
   store.edit((proj: Project) => {
     const current = proj.sections.find((s) => s.id === store.section?.id);
     if (destination.kind === 'current' && current) {
@@ -135,9 +136,12 @@ export async function addImports(
       if (target.mode === 'document') target.doc = doc();
       proj.sections.push(target);
     }
+    const before = target.mode === 'slides' ? target.slides.length : 0;
     place(target, metas, blocks);
+    if (target.mode === 'slides') firstNewSlide = target.slides[before]?.id ?? null;
   });
-  if (target) store.select({ section: target.id, slide: null, items: [] });
+  // Show what was just added.
+  if (target) store.select({ section: target.id, slide: firstNewSlide, items: [] });
   return target;
 }
 

@@ -7,6 +7,7 @@
   import TopBar from './lib/components/TopBar.svelte';
   import Welcome from './lib/components/Welcome.svelte';
   import { build } from './lib/state/build.svelte.ts';
+  import { removeItems } from './lib/state/items.ts';
   import { store } from './lib/state/project.svelte.ts';
 
   let booting = $state(true);
@@ -32,6 +33,15 @@
 
   function onKey(e: KeyboardEvent) {
     const mod = e.metaKey || e.ctrlKey;
+    // Delete selected items even when focus left the slide (e.g. after a popover).
+    if ((e.key === 'Delete' || e.key === 'Backspace') && e.target === document.body && store.selection.items.length) {
+      const mode = store.section?.mode;
+      if (mode === 'slides' || mode === 'canvas') {
+        e.preventDefault();
+        removeItems(store.selection.items);
+      }
+      return;
+    }
     if (!mod || isEditable(e.target)) return;
     if (e.key.toLowerCase() === 'z') {
       e.preventDefault();

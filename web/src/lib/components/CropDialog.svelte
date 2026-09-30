@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { Crop, ImageAdjust } from '../../model/types.ts';
   import Button from '../ui/Button.svelte';
   import Modal from '../ui/Modal.svelte';
@@ -22,21 +23,40 @@
 
   let url = $state<string | undefined>();
   let natural = $state({ w: 1, h: 1 });
+  let loaded = $state(false);
   let rect = $state<Crop>({ ...FULL });
   let aspect = $state<string>('free');
 
-  // Fresh state each time the dialog opens.
+  // Fresh state each time the dialog opens, and only then: later prop
+  // updates must not throw away the crop being edited.
+  let wasOpen = false;
   $effect(() => {
-    if (!open) return;
+    const isOpen = open;
+    if (isOpen && !wasOpen) untrack(init);
+    wasOpen = isOpen;
+  });
+
+  function init() {
     rect = { ...(crop ?? FULL) };
     aspect = 'free';
-    url = undefined;
     const orient = $state.snapshot(adjust) as Partial<ImageAdjust> | undefined;
+    // Unturned pictures can show the original file right away. The dialog's
+    // content stays mounted while closed, so the same picture is still loaded.
+    const direct = !orient?.rotate && !orient?.flipX && !orient?.flipY ? assets.url(asset) : undefined;
+    if (direct) {
+      if (url !== direct) {
+        loaded = false;
+        url = direct;
+      }
+      return;
+    }
+    url = undefined;
+    loaded = false;
     assets.preview(asset, undefined, orient, 1400).then(
       (u) => (url = u),
       () => {},
     );
-  });
+  }
 
   const scale = $derived(Math.min(BOX_W / natural.w, BOX_H / natural.h));
   const dw = $derived(Math.round(natural.w * scale));
@@ -139,11 +159,11 @@
       ]}
       onchange={setAspect}
     />
-    <span class="size">{pixels}</span>
+    {#if loaded}<span class="size">{pixels}</span>{/if}
   </div>
   <div class="box">
     {#if url}
-      <div class="stage" style="width: {dw}px; height: {dh}px" role="presentation" onpointermove={move} onpointerup={up} onpointercancel={up}>
+      <div class="stage" style="width: {dw}px; height: {dh}px; visibility: {loaded ? 'visible' : 'hidden'}" role="presentation" onpointermove={move} onpointerup={up} onpointercancel={up}>
         <img
           src={url}
           alt=""
@@ -151,6 +171,7 @@
           onload={(e) => {
             const img = e.currentTarget as HTMLImageElement;
             natural = { w: img.naturalWidth, h: img.naturalHeight };
+            loaded = true;
           }}
         />
         <div

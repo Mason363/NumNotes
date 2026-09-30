@@ -2,6 +2,7 @@
 // paragraphs, headings, lists, quotes, code, tables, pictures and math.
 
 import type { FontFamily, RichNode } from '../../model/types.ts';
+import { readableOn } from '../contrast.ts';
 import type { PackFont } from '../fonts.ts';
 import { ITEM_ANIM, ITEM_HEADING, ITEM_IMAGE, rgb565 } from '../format.ts';
 import { DEFAULT_ADJUST, DEFAULT_QUALITY } from '../images.ts';
@@ -423,7 +424,7 @@ export class Flow {
         w: gw,
         h: face.lineHeight,
         font: first.font.index,
-        color: rgb565(s.color),
+        color: rgb565(s.highlight ? readableOn(s.highlight, s.color) : s.color),
         codepoints: [...text].map((c) => c.codePointAt(0)!),
         spaceExtra16: extra16,
         underline: s.underline,
@@ -568,6 +569,8 @@ export class Flow {
           spacing: 0.3,
           headings: false,
           background: bg ?? this.opts.background,
+          // Pale cells in a dark theme (or dark cells in a light one) need other text.
+          color: bg ? readableOn(bg, this.opts.color) : this.opts.color,
         });
         for (const child of cell.content ?? []) {
           if (header && child.type === 'paragraph') {
